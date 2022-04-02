@@ -2,7 +2,6 @@ import { takeEvery, call, put, fork, delay } from 'redux-saga/effects'
 import { push } from 'connected-react-router'
 import debug from 'debug'
 import { t } from '@lingui/macro'
-import { actions as notificationsActions } from '@store/notifications'
 import { FetchAction, actions as keepActions } from '@inventi/keep'
 import routes from '@pages/index'
 import { isActionFetchRequestedFor, isActionMutationRequestedFor, isActionMutationSucceededFor } from '../utils'
@@ -23,7 +22,7 @@ function* mutateLogin(action: FetchAction): Generator {
 function* mutateLoginSuccess(action: FetchAction): Generator {
   yield put(actions.setLogin({ token: action?.payload?.token, exp: action?.payload?.exp }))
 
-  yield put(notificationsActions.push(t({ id: 'notification.login.success', message: 'You have been succesfully logged in.' })))
+  yield alert(t({ id: 'notification.login.success', message: 'You have been succesfully logged in.' }))
   userDebug('Login successful', action?.payload)
   yield put(keepActions.fetchStart('user', ['me']))
   yield put(push(routes.Homepage.route.toUrl()))

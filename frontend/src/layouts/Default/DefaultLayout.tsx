@@ -1,9 +1,6 @@
-import { useCallback } from 'react'
 import styled from '@xstyled/styled-components'
 import { NavLink } from 'react-router-dom'
 import Header from '@components/blocks/Header'
-import Notifications, { NotificationType } from '@components/blocks/Notifications'
-import Button from '@components/elements/Button'
 import pages from '@pages'
 import { Normalize, GlobalStyle, LayoutStyle } from './styles'
 
@@ -32,30 +29,24 @@ const StyledNavLink = styled(NavLink)`
 
 export type Props = {
   children: React.ReactNode
-  notifications?: NotificationType[]
-  pushNotification: (message: string) => void
-  user?: IUser
 }
 
-const emptyNotifications: NotificationType[] = []
-
-const DefaultLayout = ({ children, user, notifications = emptyNotifications, pushNotification }: Props): JSX.Element => {
-  const pushNotificationMemoized = useCallback(() => pushNotification('test'), [pushNotification])
+const DefaultLayout = ({ children }: Props): JSX.Element => {
   return (
     <>
       <Normalize />
       <GlobalStyle />
       <LayoutStyle />
       <Container>
-        <Header title="Weather js app" perex="An opinionated web boilerplate" user={user}>
+        <Header title="Weather js app" perex="Weather app">
           <StyledNavLink to={pages.Homepage.route.toUrl()} activeClassName="active">
             Home
           </StyledNavLink>
           <StyledNavLink to={pages.Example.route.toUrl()} activeClassName="active">
             Another page
           </StyledNavLink>
-          <StyledNavLink to={pages.ExampleForm.route.toUrl()} activeClassName="active">
-            Example form
+          <StyledNavLink to={pages.Forecast.route.toUrl()} activeClassName="active">
+            Forecast
           </StyledNavLink>
           <StyledNavLink to={pages.DatagridPage.route.toUrl()} activeClassName="active">
             Datagrid
@@ -63,13 +54,15 @@ const DefaultLayout = ({ children, user, notifications = emptyNotifications, pus
           <StyledNavLink to={pages.Login.route.toUrl()} activeClassName="active">
             Login
           </StyledNavLink>
-          <Button type="button" onClick={pushNotificationMemoized}>
-            Push notification
-          </Button>
         </Header>
-        <Notifications notifications={notifications} />
         <Content>{children}</Content>
-        <Footer>© 2021 — Adam Bisek &amp; Inventi, All Rights Reserved.</Footer>
+        <Footer>
+          <span>
+            © 2022 Tomáš Trávníček <br />
+            Grab a plate - Inventi &amp; Adam Bisek <br />
+            All Rights Reserved.
+          </span>
+        </Footer>
       </Container>
     </>
   )

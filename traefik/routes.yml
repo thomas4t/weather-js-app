@@ -24,20 +24,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://app-fe:3000"
-    app-be:
-      loadBalancer:
-        servers:
-          - url: "http://app-be:4000"
   routers:
     app-fe:
       rule: "PathPrefix(`/`)"
       entrypoints: web
       priority: 10
       service: app-fe
-      middlewares: compression,secure-headers
-    app-be:
-      rule: "PathPrefix(`/graphql`)"
-      entrypoints: web
-      priority: 11
-      service: app-be
       middlewares: compression,secure-headers

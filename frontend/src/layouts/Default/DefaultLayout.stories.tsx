@@ -22,19 +22,4 @@ export default {
 const Template: ComponentStory<typeof DefaultLayout> = (args, { user }) => <DefaultLayout {...args} user={user} />
 
 export const Basic = Template.bind({})
-Basic.args = {
-  notifications: [
-    {
-      id: faker.datatype.uuid(),
-      message: faker.lorem.sentence(),
-    },
-    {
-      id: faker.datatype.uuid(),
-      message: faker.lorem.sentence(),
-    },
-    {
-      id: faker.datatype.uuid(),
-      message: faker.lorem.sentence(),
-    },
-  ],
-}
+Basic.args = {}

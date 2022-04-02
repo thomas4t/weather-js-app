@@ -1,4 +1,3 @@
-import Avatar from '@components/elements/Avatar'
 import Icon from '@components/elements/Icon'
 import styled, { x } from '@xstyled/styled-components'
 
@@ -14,7 +13,7 @@ const Wrap = styled.div`
 
 const BottomWrap = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 `
 
 const ChildrenWrap = styled.div`
@@ -31,34 +30,24 @@ const ChildrenWrap = styled.div`
   }
 `
 
-export interface UserInfoProps {
-  user: IUser
-}
-
-const UserInfo = ({ user }: UserInfoProps): JSX.Element => (
-  <x.div display="flex" alignItems="center" border="1px solid" borderColor="gray3" borderRadius="md" p="1">
-    <x.div mr="3">{user.email}</x.div>
-    <Avatar w="3em" h="3em" src={user.avatarUrl} alt={user.email} />
-  </x.div>
-)
-
 export interface Props {
   title: string
   perex: string
   children?: React.ReactNode
-  user?: IUser
 }
 
-const Header = ({ title, perex, user, children }: Props): JSX.Element => (
+const Header = ({ title, perex, children }: Props): JSX.Element => (
   <Wrap>
-    <x.div display="flex">
-      <Icon icon="logo" width="10em" height={undefined} strokeHovered="primary1" />
+    <x.div display="flex" justifyContent="center" alignItems="center" mb={3}>
       <x.h1 display="none">{title}</x.h1>
+      <Icon icon="cloudyDay" width="4rem" height="4rem" />
+      <x.span fontSize="2rem" mt={2}>
+        {perex}
+      </x.span>
     </x.div>
-    <x.p color="gray3">{perex}</x.p>
+
     <BottomWrap>
       <ChildrenWrap>{children}</ChildrenWrap>
-      {user && <UserInfo user={user} />}
     </BottomWrap>
   </Wrap>
 )

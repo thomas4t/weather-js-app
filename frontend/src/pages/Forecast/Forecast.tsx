@@ -23,7 +23,7 @@ const Example = (props: Props): JSX.Element => (
     </x.h2>
 
     <Card mt="6">
-      <img src="https://cataas.com/cat/says/Hello%20weather%20app!" alt="cat" />
+      <img src="https://cataas.com/cat/says/hello%20world!" alt="cat" />
     </Card>
 
     <x.h2 mt="12" mb="2">

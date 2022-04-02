@@ -9,7 +9,7 @@ const Homepage = loadable(() => import('./Homepage'), {
 const Example = loadable(() => import('./Example'), {
   fallback: LoadingPage,
 })
-const ExampleForm = loadable(() => import('./ExampleForm'), {
+const Forecast = loadable(() => import('./Forecast'), {
   fallback: LoadingPage,
 })
 const DatagridPage = loadable(() => import('./DatagridPage'), {
@@ -23,7 +23,7 @@ const Login = loadable(() => import('./Login'), {
 const routes = {
   Homepage: createReactRoute('/', {}, Homepage, { exact: true }),
   Example: createReactRoute('/example', {}, Example, { exact: true }),
-  ExampleForm: createReactRoute('/example-form', {}, ExampleForm, { exact: true }),
+  Forecast: createReactRoute('/forecast', {}, Forecast, { exact: true }),
   DatagridPage: createReactRoute('/datagrid-page', {}, DatagridPage, { exact: true }),
   Login: createReactRoute('/login', {}, Login, { exact: true }),
   /* PLOP_INJECT_NEXT_ROUTE */

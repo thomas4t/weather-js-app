@@ -3,7 +3,6 @@ import fetch from './fetch'
 import mutate from './mutate'
 import { isActionFetchRequestedFor, isActionMutationRequestedFor } from './utils'
 import products from './products/sagas'
-import notifications from './notifications/sagas'
 import user from './user/sagas'
 /* PLOP_INJECT_NEXT_IMPORT */
 
@@ -17,10 +16,11 @@ function* mutateSaga(key: string): Generator {
 
 export default function* rootSaga(): Generator {
   yield all([
+    //! TODO
+    //weather()
     fetchSaga('product'), // basic fetch
     mutateSaga('order:place'), // basic mutation
     products(), // own saga
-    notifications(),
     user(),
     /* PLOP_INJECT_NEXT_SAGA */
   ])
