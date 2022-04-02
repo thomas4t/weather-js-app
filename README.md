@@ -1,12 +1,30 @@
-# Grab a plate
-## Grab your boilerplate!
+# Weather app - built with react, redux & sagas
 
-This is an opinionated boilerplate.
+Weather forecast project. <br />
+Project has been built as a sample for Bachelor thesis <br />
+Tomáš Trávníček @ UHK 2022
 
-Fit its run use Docker and docker-compose. For docker-compose I am using an alias `dc`.
+## How to run
 
-Make sure, you have both installed on your system.
+1. With docker
 
-## See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+```
+<root>/docker-compose up
+```
 
-## Must see [README](https://grab-a-plate-docz.netlify.app/)
+App starts on `http://localhost/`
+
+2. Razzle
+
+```
+<root>cp .env-example ./frontend/.env
+```
+
+```
+<root>/frontend/yarn
+<root>/frontend/yarn dev
+```
+
+App starts on `http://localhost:3000/`
+
+## Based on awesome [Grab a plate from INVENTI & Adam Bisek](https://grab-a-plate-docz.netlify.app/)

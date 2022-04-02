@@ -1,3 +1,0 @@
-variable "configuration" {
-  type = any
-}

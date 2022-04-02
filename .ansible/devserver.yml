@@ -1,8 +1,0 @@
----
-- hosts: devserver
-  become: true
-  roles:
-    - role: devserver
-      deployUser: deploy
-      # this SSH key will be used for connecting Gitlab CI to server with this key in order to perform deploys
-      deployPublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCv3GvPeDFjnDd6ImjdbVQVKyHAVXEMX696NttrMQdQp6LBqvyPsMSa7bcy/UK3JERlS0Fwc96pm0fAgLPT1zYFs7l7wuaScePO3XYR9C+UOoqsCnDVCIdMaFu4yA1n3ErOQ+Z+pAynpS9RO4ZhHhOtnITlyM30pR/kLn4zyNFiNoCAPxcaE3ueXMGt3Z7RH4zfkMlxvXOKnjZdOp5HCowzF6JwP7RakmCN0aaELzUOMxQN1NMFVpszVR2/Stl/6Kp/ID9pyjkZT8SDiaT9bwAQmEVY8QV9ctO46k3U8hq8ch3fCUmdVO/iV6tfH9LYef1GzfiPoSdzNrbRavUWiKt1"

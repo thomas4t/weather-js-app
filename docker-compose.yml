@@ -19,38 +19,6 @@ services:
       - "traefik.http.routers.app-fe.entrypoints=web"
       - "traefik.http.routers.app-fe.service=app-fe"
       - "traefik.http.routers.app-fe.middlewares=compression,secure-headers,errorpages"
-  app-be:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
-    ports:
-      - '${BACKEND__PORT:-4000}:4000'
-    env_file:
-      - .env
-    volumes:
-      - ./backend:/app:delegated
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.app-be.loadbalancer.server.port=4000"
-      - "traefik.http.routers.app-be.rule=PathPrefix(`/graphql`)"
-      - "traefik.http.routers.app-be.entrypoints=web"
-      - "traefik.http.routers.app-be.service=app-be"
-      - "traefik.http.routers.app-be.middlewares=compression,secure-headers,errorpages"
-    depends_on:
-      - db
-  db:
-    build:
-      context: ./database
-    restart: always
-    environment:
-      TZ: 'Europe/Prague'
-      PGTZ: 'Europe/Prague'
-    env_file:
-      - .env
-    volumes:
-      - ./.volumes/postgres:/var/lib/postgresql/data:delegated
-    ports:
-      - 5432:5432
   traefik:
     image: "traefik:v2.6.1"
     restart: unless-stopped
@@ -94,7 +62,6 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     depends_on:
       - app-fe
-      - app-be
   error:
     image: guillaumebriday/traefik-custom-error-pages
     labels:
