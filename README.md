@@ -6,9 +6,12 @@ Tomáš Trávníček @ UHK 2022
 
 ## How to run
 
+Get valid openweathermap.org API KEY - needed in .env
+
 1. With docker
 
 ```
+<root>cp .env-example .env
 <root>/docker-compose up
 ```
 
@@ -18,9 +21,6 @@ App starts on `http://localhost/`
 
 ```
 <root>cp .env-example ./frontend/.env
-```
-
-```
 <root>/frontend/yarn
 <root>/frontend/yarn dev
 ```
