@@ -1,8 +1,8 @@
+import axios, { Method } from 'axios'
 import get from 'lodash/get'
 import { Action } from 'redux'
 import { actionTypes } from '@inventi/keep'
 import getRuntimeConfig from '../utils/getRuntimeConfig'
-import axios, { Method } from 'axios'
 
 export const isActionFetchRequestedFor =
   (key: string) =>
@@ -24,7 +24,7 @@ export const weatherApiEndpoint =
 
 export const weatherApiKey = typeof window !== 'undefined' ? getRuntimeConfig('FRONTEND__OPENWEATHERMAP_APIKEY') : process.env.FRONTEND__OPENWEATHERMAP_APIKEY
 
-// token not needed atm
+// auth token not needed atm, simple fetch
 export const makeAxiosRequest = async (method: Method, url: string, variables?: { [key: string]: any }): Promise<any> => {
   const { data } = await axios({
     method,
@@ -32,19 +32,4 @@ export const makeAxiosRequest = async (method: Method, url: string, variables?: 
     data: variables,
   })
   return data
-}
-
-// export const formatApiError = (e: ClientError | Error | any): string =>
-//   e?.response?.errors ? JSON.parse(JSON.stringify(e?.response?.errors))[0]?.message : JSON.stringify(e?.message)
-
-export const getFirstObjectProperty = (obj: Record<string, any> = {}): any => {
-  const keys = Object.keys(obj)
-  if (keys.length !== 1) return obj
-  return obj[keys[0]]
-}
-
-export const defaultTransform = (responseData?: Record<string | number | symbol, unknown>): any => {
-  // try to unwrap = get first object prop if only one
-  const first = getFirstObjectProperty(responseData)
-  return first?.edges || first
 }

@@ -1,9 +1,9 @@
 import React from 'react'
+import { Trans } from '@lingui/react'
 import { x } from '@xstyled/styled-components'
-import Card, { CardVariant } from '@components/elements/Card'
+import Card from '@components/elements/Card'
 import { CityWeather } from '@typings/entities/Weather'
 import dayjs from 'dayjs'
-import { Trans } from '@lingui/react'
 
 type Props = {
   weather: CityWeather

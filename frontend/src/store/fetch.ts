@@ -1,7 +1,7 @@
 import flow from 'lodash/flow'
 import { put, call } from 'redux-saga/effects'
 import { actions, promiseControlSymbol, FetchAction } from '@inventi/keep'
-import { defaultTransform, makeAxiosRequest } from './utils'
+import { makeAxiosRequest } from './utils'
 
 type Transform = (data: any) => any
 

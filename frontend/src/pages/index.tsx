@@ -9,7 +9,7 @@ const Homepage = loadable(() => import('./Homepage'), {
 const Forecast = loadable(() => import('./Forecast'), {
   fallback: LoadingPage,
 })
-const DatagridPage = loadable(() => import('./DatagridPage'), {
+const About = loadable(() => import('./About'), {
   fallback: LoadingPage,
 })
 /* PLOP_INJECT_NEXT_IMPORT */
@@ -17,7 +17,7 @@ const DatagridPage = loadable(() => import('./DatagridPage'), {
 const routes = {
   Homepage: createReactRoute('/', {}, Homepage, { exact: true }),
   Forecast: createReactRoute('/forecast', {}, Forecast, { exact: true }),
-  DatagridPage: createReactRoute('/datagrid-page', {}, DatagridPage, { exact: true }),
+  DatagridPage: createReactRoute('/about', {}, About, { exact: true }),
   /* PLOP_INJECT_NEXT_ROUTE */
 }
 

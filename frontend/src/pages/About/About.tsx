@@ -2,7 +2,7 @@ import Page from '@components/blocks/Page'
 import { x } from '@xstyled/styled-components'
 import MyDatagrid from './components/Datagrid'
 
-const DatagridPage = (): JSX.Element => (
+const About = (): JSX.Element => (
   <Page>
     <x.h2 mb="2">Page with simple datagrid</x.h2>
     <x.p>Data are loaded from backend</x.p>
@@ -10,4 +10,4 @@ const DatagridPage = (): JSX.Element => (
   </Page>
 )
 
-export default DatagridPage
+export default About
