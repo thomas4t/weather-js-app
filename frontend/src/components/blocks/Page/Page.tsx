@@ -1,15 +1,12 @@
 import styled from '@xstyled/styled-components'
-import PermissionsBoundary from '@components/elements/PermissionsBoundary'
 import LoadingBoundary from '@components/elements/LoadingBoundary'
 import Error500 from '@pages/Error500'
 import Loading from '@pages/Loading'
-import permisionsNeededToAcl from '@utils/permisionsNeededToAcl'
 
 export type Props = {
   children: React.ReactNode
   isLoading?: boolean
   error?: string
-  permisionsNeeded?: string
 }
 
 const Wrap = styled.div`
@@ -19,15 +16,10 @@ const Wrap = styled.div`
   margin: 10px auto 0;
 `
 
-const Page = ({ children, isLoading, error, permisionsNeeded }: Props): JSX.Element => {
-  const [resource, operation] = permisionsNeededToAcl(permisionsNeeded)
-  return (
-    <PermissionsBoundary resource={resource} operation={operation} errorComponent={Error500}>
-      <LoadingBoundary isLoading={isLoading} error={error} loadingComponent={Loading} errorComponent={Error500}>
-        <Wrap>{children}</Wrap>
-      </LoadingBoundary>
-    </PermissionsBoundary>
-  )
-}
+const Page = ({ children, isLoading, error }: Props): JSX.Element => (
+  <LoadingBoundary isLoading={isLoading} error={error} loadingComponent={Loading} errorComponent={Error500}>
+    <Wrap>{children}</Wrap>
+  </LoadingBoundary>
+)
 
 export default Page

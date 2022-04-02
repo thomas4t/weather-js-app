@@ -8,18 +8,16 @@ export type Props = {
   error?: string
 }
 
-const Homepage = ({ isLoading, error }: Props): JSX.Element => {
-  return (
-    <Page isLoading={isLoading} error={error}>
-      <x.h2 mb="2">
-        <Trans id="page.homepage.title" message="Homepage, welcome!" />
-      </x.h2>
+const Homepage = ({ isLoading, error }: Props): JSX.Element => (
+  <Page isLoading={isLoading} error={error}>
+    <x.h2 mb="2">
+      <Trans id="page.homepage.title" message="Homepage, welcome!" />
+    </x.h2>
 
-      <Card mt="6">
-        <img src="https://cataas.com/cat/says/Hello%20weather%20app!" alt="cat" />
-      </Card>
-    </Page>
-  )
-}
+    <Card mt="6">
+      <img src="https://cataas.com/cat/says/Hello%20weather%20app!" alt="cat" />
+    </Card>
+  </Page>
+)
 
 export default Homepage

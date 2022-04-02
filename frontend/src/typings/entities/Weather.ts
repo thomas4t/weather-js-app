@@ -58,9 +58,9 @@ export interface Weather {
 }
 
 export enum MainEnum {
-  Clear = 'Clear',
-  Clouds = 'Clouds',
-  Rain = 'Rain',
+  clear = 'Clear',
+  clouds = 'Clouds',
+  rain = 'Rain',
 }
 
 export interface Wind {

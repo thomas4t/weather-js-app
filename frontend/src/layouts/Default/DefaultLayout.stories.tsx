@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker'
 import { ComponentStory, ComponentMeta } from '@storybook/react'
 import withRouter from '@utils/storybook/withRouter'
 import DefaultLayout from './DefaultLayout'

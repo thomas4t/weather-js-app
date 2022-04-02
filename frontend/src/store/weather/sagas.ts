@@ -1,4 +1,4 @@
-import { takeEvery, put, select } from 'redux-saga/effects'
+import { takeEvery, select } from 'redux-saga/effects'
 import { FetchAction } from '@inventi/keep'
 import { selectors } from '@store/ui'
 import { isActionFetchRequestedFor, weatherApiKey, weatherApiEndpoint } from '../utils'

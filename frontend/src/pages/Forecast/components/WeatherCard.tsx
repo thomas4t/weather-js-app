@@ -1,3 +1,4 @@
+/* eslint-disable react-perf/jsx-no-new-object-as-prop */
 import React from 'react'
 import { Trans } from '@lingui/react'
 import { x } from '@xstyled/styled-components'
@@ -15,6 +16,7 @@ const WeatherCard = ({ weather }: Props) => {
   const listEndIdx = list.length - 1
   const dateFrom = dayjs(list[listStartIdx].dt_txt).format('DD/MM/YYYY')
   const dateTo = dayjs(list[listEndIdx].dt_txt).format('DD/MM/YYYY')
+
   return (
     <Card>
       <x.h2>

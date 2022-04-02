@@ -19,10 +19,12 @@ type Props = {
   onSearchClear: () => void
 }
 
+const inputSearchIcons = <Icon key="checkTick" icon="checkTick" stroke="secondary4" strokeHovered="gray1" />
+
 const Forecast = ({ isLoading, error, search, searchResults, onSearchChange, onSearchSubmit, onSearchClear }: Props): JSX.Element => {
-  const searchValid = search?.length > 3
+  const isSearchValid = search?.length > 3
   return (
-    <Page>
+    <Page isLoading={isLoading}>
       <x.h2 mb="2">
         <Trans id="forecast.heading" message="Lookup by city" />
       </x.h2>
@@ -32,11 +34,11 @@ const Forecast = ({ isLoading, error, search, searchResults, onSearchChange, onS
         onChangeText={onSearchChange}
         onEnter={onSearchSubmit}
         placeholder={t({ id: 'forecast.searchInput.placeholder', message: 'Type to search ...' })}
-        icons={searchValid ? [<Icon key="checkTick" icon="checkTick" stroke="secondary4" strokeHovered="gray1" />] : undefined}
+        icons={isSearchValid ? inputSearchIcons : undefined}
       />
 
-      <Button type="button" onClick={onSearchSubmit} variant={searchValid ? ButtonVariant.primary : ButtonVariant.bare} disabled={!searchValid} my={4}>
-        {searchValid ? (
+      <Button type="button" onClick={onSearchSubmit} variant={isSearchValid ? ButtonVariant.primary : ButtonVariant.bare} disabled={!isSearchValid} my={4}>
+        {isSearchValid ? (
           <Trans id="forecast.search.submit" message="Try your luck" />
         ) : (
           <>

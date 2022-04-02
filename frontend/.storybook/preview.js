@@ -1,5 +1,4 @@
 import withTheme, { defaultTheme } from '@utils/storybook/withTheme'
-import withUser from '@utils/storybook/withUser'
 
 export const parameters = {
   grid: {
@@ -58,4 +57,4 @@ export const globalTypes = {
   },
 }
 
-export const decorators = [withTheme, withUser]
+export const decorators = [withTheme]
