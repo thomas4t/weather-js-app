@@ -1,0 +1,31 @@
+import { useCallback } from 'react'
+import { FetchAction } from '@inventi/keep'
+import { x } from '@xstyled/styled-components'
+import Page from '@components/blocks/Page'
+import { ProductRow } from '@typings/entities/ProductRow'
+import Button from '@components/elements/Button'
+/* PLOP_INJECT_NEXT_IMPORT */
+
+type Props = {
+  isLoading?: boolean
+  error?: string
+  products?: ProductRow[]
+  doSomething: (payload: { id: string }) => FetchAction
+}
+
+const {{pascalCase name}} = ({ isLoading, error, products, doSomething }: Props): JSX.Element => {
+  const onClick = useCallback(() => doSomething({ id: 'foo' }), [doSomething])
+  return (
+    <Page isLoading={isLoading} error={error}>
+      <x.h2>{/* PLOP_HEADING */}</x.h2>
+      <x.div>Your page&apos;s content</x.div>
+      Count: {products?.length}
+      <Button ml="3" type="button" onClick={onClick}>
+        Click me
+      </Button>
+      {/* PLOP_INJECT_CHILDREN */}
+    </Page>
+  )
+}
+
+export default {{pascalCase name}}

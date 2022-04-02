@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  app-fe:
+    restart: unless-stopped
+    image: "%AWS_ECR_HOST%/%AWS_ECR_NAMESPACE%/app-fe:%APP_VERSION%"
+    volumes:
+      - ${EB_LOG_BASE_DIR}/app-fe:/app/var/log/
+    mem_limit: 256m
+    environment:
+      APP_ENV: "%APP_ENV%"
+      APP_VERSION: "%APP_VERSION%"
+      FRONTEND__GRAPHQL_ENDPOINT_URL: "/graphql"
+      FRONTEND__GRAPHQL_ENDPOINT_URL_SERVER: "http://app-be:4000/graphql"
+    env_file:
+      - .env
+    links:
+      - app-be
+
+  app-be:
+    restart: unless-stopped
+    image: "%AWS_ECR_HOST%/%AWS_ECR_NAMESPACE%/app-be:%APP_VERSION%"
+    volumes:
+      - ${EB_LOG_BASE_DIR}/app-be:/app/var/log
+    mem_limit: 512m
+    env_file:
+      - .env
+    environment:
+      APP_VERSION: "%APP_VERSION%"
+
+  traefik:
+    image: "%AWS_ECR_HOST%/%AWS_ECR_NAMESPACE%/traefik:%APP_VERSION%"
+    ports:
+      - "80:80"
+    mem_limit: 128m
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "${EB_LOG_BASE_DIR}/traefik:/var/log/traefik"
+    env_file:
+      - .env
+    environment:
+      APP_VERSION: "%APP_VERSION%"
+    links:
+      - app-fe
+      - app-be

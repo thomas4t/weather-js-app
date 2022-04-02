@@ -1,0 +1,11 @@
+import { useFetch, useMutate } from '@inventi/keep'
+import { ProductRow } from '@typings/entities/ProductRow'
+import {{pascalCase name}} from './{{pascalCase name}}'
+
+const {{pascalCase name}}Container = (): JSX.Element => {
+  const { isLoading, data: products, error } = useFetch<ProductRow[]>('products', 'products', [])
+  const doSomething = useMutate<{ id: string }>('cat:doSomething', 'cat:doSomething')
+  return <{{pascalCase name}} isLoading={isLoading} error={error} products={products} doSomething={doSomething} />
+}
+
+export default {{pascalCase name}}Container

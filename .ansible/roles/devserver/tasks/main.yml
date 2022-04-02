@@ -1,0 +1,8 @@
+---
+- name: Pilsen server
+  include: pilsen-server.yml
+  tags: pilsen-server
+
+- name: Aws
+  include: aws.yml
+  tags: aws

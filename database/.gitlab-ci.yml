@@ -1,0 +1,18 @@
+variables:
+  DATABASE_COMPONENT: "database"
+  DATABASE_VERSION: "14.1" # postgres version
+  # This variable is also set by the kaniko image based on provided COMPONENT and VERSION
+  # If these match, and an image is built in the pipeline, the sha digest is used instead in scripts
+  # this has no effect on gitlab job definitions (image:xyz) though as these are resolved before any scripts are run
+  DATABASE_IMAGE: "$CI_REGISTRY_IMAGE/$DATABASE_COMPONENT:$DATABASE_VERSION"
+
+database-build:
+  extends: .kaniko-build-template
+  stage: .pre
+  variables:
+    COMPONENT: $DATABASE_COMPONENT
+    CONTEXT: "database"
+    DOCKERFILE: "database/Dockerfile"
+  only:
+    changes:
+      - database/**/*

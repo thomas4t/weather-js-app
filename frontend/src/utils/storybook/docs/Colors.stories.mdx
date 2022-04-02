@@ -1,0 +1,22 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs'
+import { defaultTheme } from '@utils/storybook/withTheme'
+
+<Meta title="Colors" />
+
+# Colors
+
+<ColorPalette>
+  {Object.entries(defaultTheme.colors).map(([colorName, color]) => {
+    if (/^gray/.test(colorName) || /^background/.test(colorName)) return
+    const title = colorName.replace(/[0-9]+$/, '').replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase()
+    return <ColorItem key={`theme.colors.${colorName}`} title={title} subtitle={`theme.colors.${colorName}`} colors={[color]} />
+  })}
+  <ColorItem
+    title="Monochrome"
+    colors={Object.entries(defaultTheme.colors).filter(([colorName]) => /^gray/.test(colorName)).map(([, color]) => color)}
+  />
+  <ColorItem
+    title="Backgrounds"
+    colors={Object.entries(defaultTheme.colors).filter(([colorName]) => /^background/.test(colorName)).map(([, color]) => color)}
+  />
+</ColorPalette>

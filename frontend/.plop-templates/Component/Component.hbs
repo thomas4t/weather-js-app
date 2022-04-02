@@ -1,0 +1,12 @@
+import { x } from '@xstyled/styled-components'
+/* PLOP_INJECT_NEXT_IMPORT */
+
+export type Props = {} // eslint-disable-line @typescript-eslint/ban-types
+
+const {{pascalCase name}} = (props: Props): JSX.Element => (
+  <x.div my="3" p="3" border="1px dashed gray">
+    {{pascalCase name}} {typeof props} /* PLOP_INJECT_CHILDREN */
+  </x.div>
+)
+
+export default {{pascalCase name}}

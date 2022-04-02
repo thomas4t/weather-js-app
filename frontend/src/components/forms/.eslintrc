@@ -1,0 +1,5 @@
+{
+    "rules": {
+        "react-perf/jsx-no-new-object-as-prop": "off"
+    }
+}

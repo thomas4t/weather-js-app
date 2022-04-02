@@ -1,0 +1,53 @@
+# this is only variable
+ARG BARE_IMAGE=node:16.13.0-alpine
+# fill in your prebuilt base image
+ARG BASE_IMAGE=base
+
+############
+## base
+###########
+FROM ${BARE_IMAGE} as base
+
+# Step 1: Install dev tools
+# workaround for Error: could not get uid/gid
+RUN apk update && apk upgrade && \
+    apk add jq && \
+    npm config set unsafe-perm true
+
+RUN yarn global add serve@13
+
+
+############
+## dev
+###########
+FROM ${BASE_IMAGE} as build
+
+WORKDIR /
+
+# this will cache dependencies in docker layer against the specific version of the dep files
+COPY package.json yarn.lock ./
+RUN yarn install
+
+# copy the rest of the app
+COPY . .
+
+# build the app
+RUN yarn run storybook:build
+
+
+############
+## app
+###########
+FROM ${BASE_IMAGE} as app
+
+WORKDIR /
+
+# ENV DEBUG=*
+
+# Step 2: Copy already built application
+COPY . .
+COPY --from=build storybook-static storybook-static
+
+# Step 3: Expose and run
+EXPOSE 6006
+CMD ["serve", "storybook-static", "-p", "6006"]

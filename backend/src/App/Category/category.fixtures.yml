@@ -1,0 +1,6 @@
+entity: Category
+items:
+  category{1..9}:
+    title: '{{name.firstName}}'
+    product: '@product($current)'
+    topCategory: '@topCategory($current)'

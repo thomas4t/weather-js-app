@@ -1,0 +1,21 @@
+variables:
+  BUILDER_COMPONENT: "builder"
+  BUILDER_VERSION: "5.1" # If you change the builder, bump the version here
+  # This variable is also set by the kaniko image based on provided COMPONENT and VERSION
+  # If these match, and an image is built in the pipeline, the sha digest is used instead in scripts
+  # this has no effect on gitlab job definitions (image:xyz) though as these are resolved before any scripts are run
+  BUILDER_IMAGE: "$CI_REGISTRY_IMAGE/$BUILDER_COMPONENT:$BUILDER_VERSION"
+
+builder-build:
+  extends: .kaniko-build-template
+  stage: .pre
+  except:
+    - tags
+  variables:
+    COMPONENT: $BUILDER_COMPONENT
+    CONTEXT: "."
+    DOCKERFILE: ".gitlab-ci.builder.dockerfile"
+  only:
+    changes:
+    - .gitlab-ci.builder.yml
+    - .gitlab-ci.builder.dockerfile

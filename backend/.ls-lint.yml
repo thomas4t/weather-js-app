@@ -1,0 +1,10 @@
+ls: 
+    src:
+        .ts: regex:[a-zA-Z0-9]+\.[a-zA-Z]+ | camelCase | PascalCase
+        .spec.ts: regex:[a-zA-Z0-9]+\.[a-zA-Z]+
+        .e2e-spec.ts: regex:[a-zA-Z0-9]+\.[a-zA-Z]+
+        .d.ts: camelCase | PascalCase
+        .svg: camelCase
+
+ignore:
+    - node_modules

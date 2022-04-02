@@ -1,0 +1,43 @@
+http:
+  middlewares:
+    # Compression
+    compression:
+      compress: true
+
+    secure-headers:
+      headers:
+        customResponseHeaders:
+          # Obfuscate server tokens
+          X-Powered-By: inventi
+          X-Keystone-App-Version: inventi
+          Server: inventi
+          # Security
+          X-Frame-Options: deny
+          X-XSS-Protection: 1; mode=block
+          X-Content-Type-Options: nosniff
+        # Security
+        browserXssFilter: true
+        customFrameOptionsValue: SAMEORIGIN
+
+  services:
+    app-fe:
+      loadBalancer:
+        servers:
+          - url: "http://app-fe:3000"
+    app-be:
+      loadBalancer:
+        servers:
+          - url: "http://app-be:4000"
+  routers:
+    app-fe:
+      rule: "PathPrefix(`/`)"
+      entrypoints: web
+      priority: 10
+      service: app-fe
+      middlewares: compression,secure-headers
+    app-be:
+      rule: "PathPrefix(`/graphql`)"
+      entrypoints: web
+      priority: 11
+      service: app-be
+      middlewares: compression,secure-headers

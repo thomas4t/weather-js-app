@@ -1,0 +1,5 @@
+{
+  "threshold": 15,
+  "ignore": ["src/@packages/**/*", "src/components/elements/Icon/assets/*"],
+  "noSymlinks": true
+}

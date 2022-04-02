@@ -1,0 +1,106 @@
+version: '3.3'
+services:
+  app-fe:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - '${FRONTEND__PORT:-3000}:${FRONTEND__PORT:-3000}'
+      - '3001:3001'
+    volumes:
+      - ./frontend:/app:delegated
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.app-fe.loadbalancer.server.port=3000"
+      - "traefik.http.routers.app-fe.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.app-fe.priority=10"
+      - "traefik.http.routers.app-fe.entrypoints=web"
+      - "traefik.http.routers.app-fe.service=app-fe"
+      - "traefik.http.routers.app-fe.middlewares=compression,secure-headers,errorpages"
+  app-be:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - '${BACKEND__PORT:-4000}:4000'
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app:delegated
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.app-be.loadbalancer.server.port=4000"
+      - "traefik.http.routers.app-be.rule=PathPrefix(`/graphql`)"
+      - "traefik.http.routers.app-be.entrypoints=web"
+      - "traefik.http.routers.app-be.service=app-be"
+      - "traefik.http.routers.app-be.middlewares=compression,secure-headers,errorpages"
+    depends_on:
+      - db
+  db:
+    build:
+      context: ./database
+    restart: always
+    environment:
+      TZ: 'Europe/Prague'
+      PGTZ: 'Europe/Prague'
+    env_file:
+      - .env
+    volumes:
+      - ./.volumes/postgres:/var/lib/postgresql/data:delegated
+    ports:
+      - 5432:5432
+  traefik:
+    image: "traefik:v2.6.1"
+    restart: unless-stopped
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    labels:
+      - "traefik.enable=true"
+      # Dashboard reroute to HTTP port 
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.localhost`)"
+      - "traefik.http.routers.dashboard.entrypoints=web"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=compression,basic-auth,errorpages"
+      # Compression
+      - "traefik.http.middlewares.compression.compress=true"
+      # Obfuscate server tokens
+      - "traefik.http.middlewares.secure-headers.headers.customresponseheaders.X-Powered-By=inventi"
+      - "traefik.http.middlewares.secure-headers.headers.customresponseheaders.X-Keystone-App-Version=inventi"
+      - "traefik.http.middlewares.secure-headers.headers.customresponseheaders.Server=inventi"
+      # Security
+      - "traefik.http.middlewares.secure-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.secure-headers.headers.customFrameOptionsValue=SAMEORIGIN"
+      - "traefik.http.middlewares.secure-headers.headers.customresponseheaders.X-Frame-Options=deny"
+      - "traefik.http.middlewares.secure-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
+      - "traefik.http.middlewares.secure-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      # Basic auth
+      - "traefik.http.middlewares.basic-auth.basicauth.users=traefik:$$apr1$$e4CRLlHd$$4F9s8RHs9z3GcctPOWmUz."
+      - "traefik.http.middlewares.basic-auth.basicauth.removeheader=true"
+      # Error pages
+      - "traefik.http.middlewares.errorpages.errors.status=400-599"
+      - "traefik.http.middlewares.errorpages.errors.service=error"
+      - "traefik.http.middlewares.errorpages.errors.query=/{status}.html"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    depends_on:
+      - app-fe
+      - app-be
+  error:
+    image: guillaumebriday/traefik-custom-error-pages
+    labels:
+          - "traefik.enable=true"
+          - "traefik.http.routers.error.rule=PathPrefix(`/`)"
+          - "traefik.http.routers.error.priority=1"
+          - "traefik.http.routers.error.service=error"
+          - "traefik.http.services.error.loadbalancer.server.port=80"
+          - "traefik.http.routers.error.entrypoints=web"

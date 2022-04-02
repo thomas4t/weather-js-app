@@ -1,0 +1,11 @@
+ls: 
+    src:
+        .js: camelCase
+        .ts: camelCase | PascalCase
+        .d.ts: camelCase | PascalCase
+        .svg: camelCase
+
+ignore:
+    - node_modules
+    - src/@packages
+    - src/typings/styled-components.d.ts

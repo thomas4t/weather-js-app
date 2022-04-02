@@ -1,0 +1,18 @@
+import { takeEvery } from 'redux-saga/effects'
+import { FetchAction } from '@inventi/keep'
+import { isActionFetchRequestedFor, isActionMutationRequestedFor } from '../utils'
+import fetch from '../fetch'
+import mutate from '../mutate'
+
+function* fetchCat(action: FetchAction): Generator {
+  yield fetch(action)
+}
+
+function* mutateCat(action: FetchAction): Generator {
+  yield mutate(action)
+}
+
+export default function* watch(): Generator {
+  yield takeEvery(isActionFetchRequestedFor('{{name}}'), fetchCat)
+  yield takeEvery(isActionMutationRequestedFor('{{name}}:myMutation'), mutateCat)
+}

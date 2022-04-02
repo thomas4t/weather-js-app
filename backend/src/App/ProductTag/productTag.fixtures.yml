@@ -1,0 +1,4 @@
+entity: ProductTag
+items:
+  productTag{1..9}:
+    name: '{{name.lastName}}'

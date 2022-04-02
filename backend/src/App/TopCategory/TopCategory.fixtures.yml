@@ -1,0 +1,7 @@
+entity: TopCategory
+items:
+  topCategory{1..9}:
+    title: '{{lorem.word}}'
+
+  topCategory:
+    name: 'Vladimir'

@@ -1,0 +1,7 @@
+.env
+.volumes
+.idea/
+node_modules/
+docker-compose.override.yml
+renovate.log.json
+.DS_Store

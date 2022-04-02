@@ -1,0 +1,32 @@
+variables:
+  TRAEFIK_COMPONENT: "traefik"
+
+# This job extracts FE version from the package.json and shares it in an env variable with following jobs
+# The version is labeled with GIT ref slug unless it is a stable branch (develop/release/master)
+# TRAEFIK_IMAGE is then used to deploy the app. If traefik image is also built, the var is then replaced
+# with the pinned image version to prevent deploying versions from different pipelines.
+traefik-version:
+  image: "$BUILDER_IMAGE"
+  stage: version
+  script:
+    - cd traefik
+    - VERSION=1
+    - VERSION="$VERSION-$GIT_SLUG"
+    - echo "TRAEFIK_VERSION=$VERSION" > ci.env
+    - echo "TRAEFIK_IMAGE=$DOCKER_REPOSITORY/$TRAEFIK_COMPONENT:$VERSION" >> ci.env
+    - cat ci.env
+  artifacts:
+    reports:
+      dotenv: traefik/ci.env
+
+traefik-image:
+  extends: .kaniko-build-template
+  dependencies: ["traefik-version"]
+  needs: ["traefik-version"]
+  variables:
+    COMPONENT: $TRAEFIK_COMPONENT
+    CONTEXT: "traefik"
+    DOCKERFILE: "traefik/Dockerfile"
+  only: &traefik-only
+    changes:
+      - traefik/**/*

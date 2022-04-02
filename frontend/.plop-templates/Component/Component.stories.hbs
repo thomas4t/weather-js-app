@@ -1,0 +1,18 @@
+import { faker } from '@faker-js/faker'
+import { ComponentStory, ComponentMeta } from '@storybook/react'
+import withTheme from '@utils/storybook/withTheme'
+import {{pascalCase name}} from './{{pascalCase name}}'
+
+export default {
+  title: '{{pascalCase name}}/{{pascalCase name}}',
+  component: {{pascalCase name}},
+  decorators: [withTheme],
+} as ComponentMeta<typeof {{pascalCase name}}>
+
+const Template: ComponentStory<typeof {{pascalCase name}}> = (args) => <{{pascalCase name}} {...args} />
+
+export const Basic = Template.bind({})
+
+Basic.args = {
+  children: faker.lorem.word(),
+}

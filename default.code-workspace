@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "Weather js app",
+      "path": "."
+    },
+    {
+      "name": "Frontend",
+      "path": "frontend"
+    },
+    {
+      "name": "Backend",
+      "path": "backend"
+    }
+  ]
+}

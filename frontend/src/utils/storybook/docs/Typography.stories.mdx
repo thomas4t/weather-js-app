@@ -1,0 +1,99 @@
+import { typography } from '@storybook/theming'
+import { Meta, Typeset, Canvas } from '@storybook/addon-docs'
+import styled, { system, SystemProps, css, th, x } from '@xstyled/styled-components'
+import { baseFontSizePx } from '@layouts/Default/styles'
+import { Themed, defaultTheme } from '@utils/storybook/withTheme'
+
+export const fontSizes = Object.keys(defaultTheme.fontSizes).map((fontSizes) => `${defaultTheme.fontSizes[fontSizes]}`)
+export const sampleText = 'Příliš žluťoučký kůň úpěl ďábelské ódy.'
+
+<Meta title="Typography" />
+
+# Typography
+
+<>
+  <Canvas>
+    <x.p fontSize="1rem">font-family: "{defaultTheme.fonts.primary}";</x.p>
+  </Canvas>
+  <Canvas>
+    <x.div>
+      <x.div fontSize="1rem" mb="6">font-size:</x.div>
+      <x.div>
+        {Object.entries(defaultTheme.fontSizes).map(([name, size]) => (
+          <x.div key={name} display="flex" m="1rem 0">
+            <x.span display="inline-block" w="5rem" color="gray">{name}</x.span>
+            <x.span display="inline-block" w="5rem">{size}</x.span>
+            <x.span display="inline-block" w="8rem">(approx. {baseFontSizePx * `${size}`.replace('rem', '')}px)</x.span>
+            <x.span display="inline-block"fontSize={size} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{sampleText}</x.span>
+          </x.div>
+        ))}
+      </x.div>
+    </x.div>
+  </Canvas>
+</>
+
+### Font-weight: light
+
+<Typeset
+  fontFamily={defaultTheme.fonts.primary}
+  fontSizes={fontSizes}
+  fontWeight={defaultTheme.fontWeights.light}
+  sampleText={sampleText}
+/>
+
+### Font-weight: medium
+
+<Typeset
+  fontFamily={defaultTheme.fonts.primary}
+  fontSizes={fontSizes}
+  fontWeight={defaultTheme.fontWeights.medium}
+  sampleText={sampleText}
+/>
+
+### Font-weight: bold
+
+<Typeset
+  fontFamily={defaultTheme.fonts.primary}
+  fontSizes={fontSizes}
+  fontWeight={defaultTheme.fontWeights.bold}
+  sampleText={sampleText}
+/>
+
+### Heading
+
+<Canvas>
+  <Themed>
+    <x.div display="flex" alignItems="center">
+      <x.span mr="3rem" color="gray" fontSize="1rem">
+        h1
+      </x.span>
+      <h1>{sampleText}</h1>
+    </x.div>
+    <x.div display="flex" alignItems="center">
+      <x.span mr="3rem" color="gray" fontSize="1rem">
+        h2
+      </x.span>
+      <h2>{sampleText}</h2>
+    </x.div>
+    <x.div display="flex" alignItems="center">
+      <x.span mr="3rem" color="gray" fontSize="1rem">
+        h3
+      </x.span>
+      <h3>{sampleText}</h3>
+    </x.div>
+    <x.div display="flex" alignItems="center">
+      <x.span mr="3rem" color="gray" fontSize="1rem">
+        h4
+      </x.span>
+      <h4>{sampleText}</h4>
+    </x.div>
+  </Themed>
+</Canvas>
+
+### Paragraph
+
+<Canvas>
+  <Themed>
+    <p>{sampleText}</p>
+  </Themed>
+</Canvas>

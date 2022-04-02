@@ -1,0 +1,2 @@
+[devserver]
+172.27.40.17 ansible_user=adam

@@ -1,0 +1,95 @@
+version: '3.3'
+services:
+  app-fe:
+    restart: unless-stopped
+    image: $FRONTEND_IMAGE
+    environment:
+      - APP_ENV=production
+    env_file:
+      - .env
+    networks:
+      - "gateway"
+      - "default"
+    links:
+      # ensure that docker route to container within this docker-compose; without this, docker will randomly route to any container with this name
+      # that could be a problem, when running multiple environments (docker-compose) on same machine
+      # it is because all docker-compose sits on same network (for the sake of traefik routing)
+      - app-be
+    labels:
+      - "traefik.enable=true"
+      # HTTP
+      - "traefik.http.routers.app-fe-$ENV_NAME.rule=Host(`%APP_HOST%`) && PathPrefix(`/`)"
+      - "traefik.http.routers.app-fe-$ENV_NAME.priority=10"
+      - "traefik.http.routers.app-fe-$ENV_NAME.entrypoints=web"
+      - "traefik.http.routers.app-fe-$ENV_NAME.middlewares=redirect-to-https,errorpages"
+      # HTTPS
+      - "traefik.http.routers.app-fe-$ENV_NAME-secured.tls=true"
+      - "traefik.http.routers.app-fe-$ENV_NAME-secured.tls.certresolver=myresolver"
+      - "traefik.http.services.app-fe-$ENV_NAME-secured.loadbalancer.server.port=3000"
+      - "traefik.http.routers.app-fe-$ENV_NAME-secured.rule=Host(`%APP_HOST%`) && PathPrefix(`/`)"
+      - "traefik.http.routers.app-fe-$ENV_NAME-secured.priority=10"
+      - "traefik.http.routers.app-fe-$ENV_NAME-secured.entrypoints=websecure"
+      - "traefik.http.routers.app-fe-$ENV_NAME-secured.service=app-fe-$ENV_NAME-secured"
+      - "traefik.http.routers.app-fe-$ENV_NAME-secured.middlewares=compression,secure-headers,errorpages"
+    logging:
+      # by default docker logs until no space left on hdd; we wanna set limit
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+  app-be:
+    restart: unless-stopped
+    image: $BACKEND_IMAGE
+    environment:
+      - APP_ENV=production
+    env_file:
+      - .env
+    volumes:
+      - ./.volumes/be-uploads:/app/uploads
+    networks:
+      - "gateway"
+      - "default"
+    links:
+      # ensure that docker route to container within this docker-compose; without this, docker will randomly route to any container with this name
+      # that could be a problem, when running multiple environments (docker-compose) on same machine
+      # it is because all docker-compose sits on same network (for the sake of traefik routing)
+      - db
+    labels:
+      - "traefik.enable=true"
+      # HTTP
+      - "traefik.http.routers.app-be-$ENV_NAME.rule=Host(`%APP_HOST%`) && PathPrefix(`/graphql`)"
+      - "traefik.http.routers.app-be-$ENV_NAME.priority=11"
+      - "traefik.http.routers.app-be-$ENV_NAME.entrypoints=web"
+      - "traefik.http.routers.app-be-$ENV_NAME.middlewares=redirect-to-https,errorpages"
+      # HTTPS
+      - "traefik.http.routers.app-be-$ENV_NAME-secured.tls=true"
+      - "traefik.http.routers.app-be-$ENV_NAME-secured.tls.certresolver=myresolver"
+      - "traefik.http.services.app-be-$ENV_NAME-secured.loadbalancer.server.port=4000"
+      - "traefik.http.routers.app-be-$ENV_NAME-secured.rule=Host(`%APP_HOST%`) && PathPrefix(`/graphql`)"
+      - "traefik.http.routers.app-be-$ENV_NAME-secured.priority=11"
+      - "traefik.http.routers.app-be-$ENV_NAME-secured.entrypoints=websecure"
+      - "traefik.http.routers.app-be-$ENV_NAME-secured.service=app-be-$ENV_NAME-secured"
+      - "traefik.http.routers.app-be-secured.middlewares=compression,secure-headers,errorpages"
+    logging:
+      # by default docker logs until no space left on hdd; we wanna set limit
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    depends_on:
+      - db
+  db:
+    image: $DATABASE_IMAGE
+    restart: always
+    environment:
+      TZ: 'Europe/Prague'
+      PGTZ: 'Europe/Prague'
+    env_file:
+      - .env
+    volumes:
+      - ./.volumes/postgres:/var/lib/postgresql/data
+
+networks:
+  gateway:
+    external:
+      name: gateway

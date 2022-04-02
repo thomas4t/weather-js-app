@@ -1,0 +1,17 @@
+api:
+  dashboard: true
+  insecure: true
+
+# log:
+#   level: DEBUG
+
+providers:
+  docker:
+    exposedByDefault: false
+  file:
+    filename: /etc/traefik/routes.yml
+    watch: true
+
+entryPoints:
+  web:
+    address: :80

@@ -1,0 +1,18 @@
+{
+ "catalogs": [{
+   "path": "<rootDir>/locale/{locale}/messages",
+   "include": ["<rootDir>"],
+   "exclude": ["**/node_modules/**"]
+ }],
+ "compileNamespace": "cjs",
+ "extractBabelOptions": {},
+ "compilerBabelOptions": {},
+ "fallbackLocales": {},
+ "format": "po",
+ "locales": ["en", "cs"],
+ "orderBy": "messageId",
+ "pseudoLocale": "",
+ "rootDir": "./src/",
+ "runtimeConfigModule": ["@lingui/core", "i18n"],
+ "sourceLocale": "en",
+}

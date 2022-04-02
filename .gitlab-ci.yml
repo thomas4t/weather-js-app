@@ -1,0 +1,344 @@
+stages:
+  - version
+  - test
+  - build
+  - integration
+  - deploy
+  - deploy-stage
+  - deploy-production
+  - post-deploy
+
+variables:
+  APP_VERSION: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA-$CI_PIPELINE_ID
+  APP_VERSION_SEMANTIC: $CI_COMMIT_REF_NAME # The branch or tag name for which project is built.
+  GIT_BRANCH: $CI_COMMIT_BRANCH
+  GIT_SLUG: $CI_COMMIT_REF_SLUG
+  DOCKER_REPOSITORY: $CI_REGISTRY_IMAGE
+  DOCKER_REGISTRY: $CI_REGISTRY
+  DOCKER_REGISTRY_USERNAME: $CI_REGISTRY_USER
+  DOCKER_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  MULTIDEPLOY_HOST: grabaplate.inventi.cz
+  STAGING_HOST: stage.grabaplate.inventi.cz
+  PRODUCTION_HOST: grabaplate.inventi.cz
+  #SSH_HOST: --in-ci-config--
+  #SSH_PRIVATE_KEY: --in-ci-config--
+  #AWS_ACCESS_KEY_ID: --in-ci-config-optional-for-AWS-deploy--
+  #AWS_SECRET_ACCESS_KEY: --in-ci-config-optional-for-AWS-deploy--
+  #AWS_ECR_HOST: --in-ci-config-optional-for-AWS-deploy--
+
+include:
+  - local: .gitlab-ci.builder.yml
+  - local: 'frontend/.gitlab-ci.yml'
+  - local: 'backend/.gitlab-ci.yml'
+  - local: 'database/.gitlab-ci.yml'
+  - local: 'traefik/.gitlab-ci.yml'
+
+
+renovate:
+  image: "$BUILDER_IMAGE"
+  stage: test
+  variables:
+    # RENOVATE_TOKEN needs to be set in GitLab CI/CD variables and is a personal access token of the "renovate-bot" user with `api` scope
+    RENOVATE_CONFIG_FILE: .renovate.js
+  script:
+    - renovate
+  only:
+     - schedules
+  artifacts:
+    when: always
+    paths:
+      - renovate.log.json
+
+.branch-match-regexps:
+  - &develop-deploy-branches /^develop|develop[-\/].*$/
+  - &preview-deploy-branches /^feature|hotfix|bugfix\//
+
+# Jobs based on this template produce a docker image without the need for docker-in-docker (dind).
+# The job exports the given components pinned image so that deployments use the image built specifically in this pipeline.
+# If the image is not built in the pipeline, the default SEMVER image reference is used so it will deploy
+# the image of the same version built by another pipeline.
+# 
+# Specify either COMPONENT and VERSION variables (optionally REPOSITORY) and IMAGE will be constructed from these
+#  or else specify IMAGE with a tag and COMPONENT and VERSION will be extracted from it.
+.kaniko-build-template:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  stage: build
+  variables:
+    KANIKO_DOCKER_CONFIG: "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}"
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "${KANIKO_DOCKER_CONFIG:?}" > /kaniko/.docker/config.json
+    # image_var allows the job to specify the image value through a variable indirectly as a workaround to gitlab variable resolving limits.
+    # simply specify COMPONENT=xyz and XYZ_IMAGE=a/b/c/xyz:tag and IMAGE will be taken from XYZ_IMAGE variable
+    - component_cap="$(echo "$COMPONENT" | tr [:lower:] [:upper:] | tr - _)"
+    - image_var="${component_cap:?}_IMAGE"
+    - echo "IMAGE=${IMAGE:=$(eval echo "\$$image_var")}"
+    - echo "imgtag=${imgtag:=${IMAGE##*/}}"
+    - echo "REPOSITORY=${REPOSITORY:=${IMAGE%/*}}"
+    - echo "REPOSITORY=${REPOSITORY:=${DOCKER_REPOSITORY:?}}"
+    - echo "COMPONENT=${COMPONENT:=${imgtag%%:*}}"
+    - echo "VERSION=${VERSION:=${imgtag##*:}}"
+    - IMAGE="$REPOSITORY/$COMPONENT:$VERSION"
+    - |
+      echo "Building ${IMAGE:?}
+        COMPONENT ${COMPONENT:?required env variable} 
+        VERSION ${VERSION:?required env variable} 
+        with context ${CONTEXT:?required env variable} 
+        and dockerfile ${DOCKERFILE:?required env variable}
+        build args: ${BUILD_ARGS:-none}"
+    # TODO: figure out how to prevent overwriting stable image tags (those without any label)
+    # Other registries have this feature, not Gitlab - https://gitlab.com/gitlab-org/gitlab/-/issues/18984
+    - /kaniko/executor --context "$CONTEXT" --dockerfile "$DOCKERFILE" 
+        --destination "$IMAGE" 
+        --cache=true --cache-ttl=48h --cache-repo="$REPOSITORY/kaniko-cache"
+        --skip-unused-stages
+        --build-arg=APP_VERSION_SEMANTIC=${APP_VERSION_SEMANTIC}
+        --digest-file kaniko.digest $BUILD_ARGS
+        --force
+    - digest="$(cat kaniko.digest)"
+    - echo "${component_cap}_VERSION=$VERSION" >> ci.env
+    - echo "${component_cap}_DIGEST=$digest" >> ci.env
+    - echo "${component_cap}_IMAGE_SEMVER=$IMAGE" >> ci.env
+    - echo "${component_cap}_IMAGE=$REPOSITORY/$COMPONENT@$digest" >> ci.env
+    - cat ci.env
+
+.deploy-template:
+  image: "$BUILDER_IMAGE"
+  stage: deploy
+  when: manual
+  before_script:
+    - eval $(ssh-agent -s)
+    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    # https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # Confirm input
+    - echo "ENV_NAME=${ENV_NAME:=$GIT_SLUG}"
+    - echo "SSH_HOST=${SSH_HOST:?}"
+    - echo "DOCKER_REGISTRY=${DOCKER_REGISTRY:?}"
+    - echo "DOCKER_REGISTRY_USERNAME=${DOCKER_REGISTRY_USERNAME:?}"
+    - echo "DOCKER_REGISTRY_PASSWORD=${DOCKER_REGISTRY_PASSWORD:?}"
+    # check free space and usage
+    - ssh -oStrictHostKeyChecking=no $SSH_HOST "df && du -sx * ..?* .??* | sort -n"
+    - sleep 5
+    # login on remote server
+    - ssh "$SSH_HOST" docker login "$DOCKER_REGISTRY" -u "$DOCKER_REGISTRY_USERNAME" -p "$DOCKER_REGISTRY_PASSWORD"
+    - sleep 5
+    #TODO: consider docker machine here https://www.kevinkuszyk.com/2016/11/28/connect-your-docker-client-to-a-remote-docker-host/
+
+.dc-deploy-template:
+  extends: .deploy-template
+  script:
+    - case "$GIT_SLUG" in release|master) APP_ENV=production ;; develop*) APP_ENV=develop ;; *) APP_ENV=preview ;; esac
+
+    # Confirm input
+    - echo "GIT_SLUG=${GIT_SLUG:?}"
+    - echo "APP_VERSION=${APP_VERSION:?}"
+    - echo "CONFIG_SUFFIX=${CONFIG_SUFFIX:=develop}" 
+    - echo "APP_ENV=${APP_ENV:?}"
+    - echo "APP_HOST=$APP_HOST"
+    - echo "MULTIDEPLOY_HOST=$MULTIDEPLOY_HOST"
+
+    - cp ".env-$CONFIG_SUFFIX" ci.env
+    # Write env vars to env file
+    - echo "" >> ci.env
+    - echo "# CI autogenerated vars" >> ci.env
+    - echo "DOCKER_REPOSITORY=${DOCKER_REPOSITORY:?}" >> ci.env
+    - echo "BACKEND_IMAGE=${BACKEND_IMAGE:?}" >> ci.env
+    - echo "DATABASE_IMAGE=${DATABASE_IMAGE:?}" >> ci.env
+    - echo "FRONTEND_IMAGE=${FRONTEND_IMAGE:?}" >> ci.env
+    - echo "FRONTEND_STORYBOOK_IMAGE=${FRONTEND_STORYBOOK_IMAGE:?}" >> ci.env
+    - echo "APP_VERSION=${APP_VERSION:?}" >> ci.env
+    - echo "APP_ENV=${APP_ENV:?}" >> ci.env
+    - echo "ENV_NAME=${ENV_NAME:?}" >> ci.env
+    - echo "" >> ci.env
+    - cat ci.env
+
+    # deploy traefik
+    - ssh "$SSH_HOST" "docker network inspect gateway || docker network create --driver=bridge --attachable --internal=false gateway"
+    - sed -i -e "s/%APP_HOST%/${APP_HOST}/" "docker-compose-run-traefik.yml"
+    - sed -i -e "s/%MULTIDEPLOY_HOST%/${MULTIDEPLOY_HOST}/" "docker-compose-run-traefik.yml"
+    - cat "docker-compose-run-traefik.yml" | ssh "$SSH_HOST" "cat - > './docker-compose-run-traefik.yml'"
+    - sleep 5
+    - case "$GIT_SLUG" in master) ssh "$SSH_HOST" "docker-compose -f ./docker-compose-run-traefik.yml up --detach" ;; esac
+
+    #  create working dir
+    - ssh "$SSH_HOST" mkdir -p "$ENV_NAME"
+    - sleep 5
+
+    # Copy env files
+    - cat ci.env | ssh "$SSH_HOST" "cat - > $ENV_NAME/.env"
+    - sleep 5
+    # append CI env vars (@see https://docs.gitlab.com/ee/ci/variables/#list-all-environment-variables)
+    - ssh "$SSH_HOST" "echo '# CI env vars' >> $ENV_NAME/.env"
+    - sleep 5
+    - printenv | grep "^FRONTEND__\|^BACKEND__" | ssh "$SSH_HOST" "cat - >> $ENV_NAME/.env"
+    - sleep 5
+
+    # prepare compose file
+    - sed -i -e "s/%ENV_NAME%/${ENV_NAME}/" "docker-compose-run-$CONFIG_SUFFIX.yml"
+    - sed -i -e "s/%MULTIDEPLOY_HOST%/${MULTIDEPLOY_HOST}/" "docker-compose-run-$CONFIG_SUFFIX.yml"
+    - sed -i -e "s/%APP_HOST%/${APP_HOST}/" "docker-compose-run-$CONFIG_SUFFIX.yml"
+    
+    # copy docker-compose to server
+    - cat "docker-compose-run-$CONFIG_SUFFIX.yml" | ssh "$SSH_HOST" "cat - > '$ENV_NAME/docker-compose.yml'"
+    - sleep 5
+
+    # pull and run, wait for the environment to be up, fail if any fails
+    - ssh "$SSH_HOST" "cd '$ENV_NAME' && docker-compose pull && docker-compose up --detach --timeout 60 --remove-orphans --force-recreate"
+    - ssh "$SSH_HOST" "docker system prune --volumes -a -f"
+    - echo "Deploy done"
+
+    - DYNAMIC_ENVIRONMENT_URL=${APP_HOST:="http://$ENV_NAME.$MULTIDEPLOY_HOST"}
+    - echo "DYNAMIC_ENVIRONMENT_URL=$DYNAMIC_ENVIRONMENT_URL" >> deploy.env
+    - cat deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
+
+dev-deploy:
+  extends: .dc-deploy-template
+  when: on_success
+  only: 
+    - *develop-deploy-branches
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    url: $DYNAMIC_ENVIRONMENT_URL
+    on_stop: dev-deploy-stop
+    # auto_stop_in: 14 days <-- you can optionally enable
+
+dev-deploy-stop:
+  extends: .deploy-template
+  needs: []
+  script:
+    - echo "Removing $ENV_NAME"
+    - ssh $SSH_HOST "cd $ENV_NAME || exit 0 && docker-compose down && cd .. && sudo rm -rf $ENV_NAME"
+    - ssh $SSH_HOST docker system prune --volumes -a -f
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    action: stop
+  only: 
+    - *develop-deploy-branches
+
+preview-deploy:
+  extends: .dc-deploy-template
+  when: manual
+  only: 
+    - *preview-deploy-branches
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    url: $DYNAMIC_ENVIRONMENT_URL
+    on_stop: preview-deploy-stop
+    auto_stop_in: 14 days
+
+preview-deploy-stop:
+  extends: .deploy-template
+  needs: []
+  script:
+    - echo "Removing $ENV_NAME"
+    - ssh $SSH_HOST "cd $ENV_NAME || exit 0 && docker-compose down && cd .. && sudo rm -rf $ENV_NAME"
+    - ssh $SSH_HOST docker system prune --volumes -a -f
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    action: stop
+  only: 
+    - *preview-deploy-branches
+
+docker-logs:
+  extends: .deploy-template
+  stage: post-deploy
+  timeout: 5 minutes
+  script:
+    - echo "ENV_NAME=$ENV_NAME"
+    - ssh $SSH_HOST "cd $ENV_NAME && docker-compose ps"
+    - ssh $SSH_HOST "cd $ENV_NAME && docker ps"
+    - ssh $SSH_HOST "cd $ENV_NAME && docker-compose logs --follow"
+  only:
+    - *develop-deploy-branches
+    - *preview-deploy-branches
+
+stage-deploy-dc:
+  extends: .dc-deploy-template
+  stage: deploy-stage
+  when: manual
+  variables:
+    APP_HOST: $STAGING_HOST
+    CONFIG_SUFFIX: production
+    ENV_NAME: stage # because env name differs from GIT branch
+  only:
+    - master
+  environment:
+    name: stage
+    url: $DYNAMIC_ENVIRONMENT_URL
+
+production-deploy-dc:
+  extends: .dc-deploy-template
+  stage: deploy-production
+  when: manual
+  variables:
+    APP_HOST: $PRODUCTION_HOST
+    CONFIG_SUFFIX: production
+  only:
+    - master
+  environment:
+    name: production
+    url: $DYNAMIC_ENVIRONMENT_URL
+
+.aws-deploy-template:
+  image: docker:19.03.15
+  extends: .deploy-template
+  services:
+    - docker:19.03.15-dind
+  tags:
+    - dind
+  when: on_success
+  allow_failure: false
+  script:
+    - apk add zip
+    - .aws/aws-deploy.sh
+    - echo "DYNAMIC_ENVIRONMENT_URL=$DYNAMIC_ENVIRONMENT_URL" >> deploy.env
+    - cat deploy.env
+
+# stage-deploy-aws:
+#   extends: .aws-deploy-template
+#   stage: deploy-stage
+#   when: manual
+#   variables:
+#     AWS_ECR_HOST: $AWS_ECR_HOST
+#     AWS_ECR_NAMESPACE: "grabaplate"
+#     AWS_EB_ENVIRONMENT: grabaplate-staging
+#     AWS_EB_APP_NAME: "grabaplate"
+#     S3_DEPLOY_BUCKET: "grabaplate-stage"
+#     APP_ENV: staging
+#   before_script:
+#     - .aws/aws-push-images.sh
+#     - DYNAMIC_ENVIRONMENT_URL=http://$STAGING_HOST
+#   only:
+#     - tags
+#     - release
+
+#   environment:
+#     name: stage
+#     url: $DYNAMIC_ENVIRONMENT_URL
+
+# production-deploy-aws:
+#   extends: .aws-deploy-template
+#   stage: deploy-production
+#   when: manual
+#   variables:
+#     AWS_ECR_HOST: $AWS_ECR_HOST
+#     AWS_ECR_NAMESPACE: "grabaplate"
+#     AWS_EB_ENVIRONMENT: grabaplate-prod
+#     AWS_EB_APP_NAME: "grabaplate"
+#     S3_DEPLOY_BUCKET: "grabaplate-prod"
+#     APP_ENV: production
+#   before_script:
+#     - DYNAMIC_ENVIRONMENT_URL=http://$PRODUCTION_HOST
+#   only:
+#     - tags
+#   environment:
+#     name: production
+#     url: $DYNAMIC_ENVIRONMENT_URL

@@ -1,0 +1,25 @@
+variables:
+  BACKEND_BASE_COMPONENT: "backend_base"
+  BACKEND_BASE_VERSION: "16.13.O" # If you change dependencies, bump the version here
+  # This variable is also set by the kaniko image based on provided COMPONENT and VERSION
+  # If these match, and an image is built in the pipeline, the sha digest is used instead in scripts
+  # this has no effect on gitlab job definitions (image:xyz) though as these are resolved before any scripts are run
+  BACKEND_BASE_IMAGE: "$CI_REGISTRY_IMAGE/$BACKEND_BASE_COMPONENT:$BACKEND_BASE_VERSION"
+
+backend-base-image:
+  extends: .kaniko-build-template
+  stage: .pre
+  except:
+    - tags
+  variables:
+    COMPONENT: $BACKEND_BASE_COMPONENT
+    CONTEXT: "backend"
+    DOCKERFILE: "backend/Dockerfile"
+  before_script:
+    - export BUILD_ARGS="--target base"
+  only:
+    changes:
+      - backend/.gitlab-ci.base.yml
+      - backend/Dockerfile
+      - backend/package.json
+      - backend/yarn.lock

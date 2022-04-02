@@ -1,0 +1,30 @@
+import produce from 'immer'
+import { RootStateOrAny } from 'react-redux'
+import { PayloadAction } from '@store/types'
+
+export type {{pascalCase name}}State = {
+  foo?: string
+}
+
+type MyType = 'changeMe'
+
+export const actionTypes = {
+  setFoo: '{{pascalCase name}}/setFoo',
+}
+
+const reducer = (state: {{pascalCase name}}State = {}, action: PayloadAction): {{pascalCase name}}State =>
+  produce(state, (draft) => {
+    if (action.type === actionTypes.setFoo) {
+      draft.foo = action.payload
+    }
+  })
+
+export default reducer
+
+export const actions = {
+  setFoo: (payload: MyType): PayloadAction => ({ type: actionTypes.setFoo, payload }),
+}
+
+export const selectors = {
+  getFoo: (state: RootStateOrAny): MyType | undefined => state?.{{pascalCase name}}?.foo,
+}
