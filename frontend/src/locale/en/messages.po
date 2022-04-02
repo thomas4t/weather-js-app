@@ -13,11 +13,28 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: pages/Homepage/Homepage.tsx:48
-msgid "transExample"
-msgstr "transExample"
+#: layouts/Default/DefaultLayout.tsx:52
+msgid "nav.about"
+msgstr "About"
 
-#: store/people/sagas.ts:13
-#: store/people/sagas.ts:13
+#: layouts/Default/DefaultLayout.tsx:49
+msgid "nav.forecast"
+msgstr "Forecast"
+
+#: layouts/Default/DefaultLayout.tsx:46
+msgid "nav.home"
+msgstr "Home"
+
+#: store/user/sagas.ts:20
+#: store/user/sagas.ts:20
+msgid "notification.login.success"
+msgstr "You have been succesfully logged in."
+
+#: pages/Homepage/Homepage.tsx:48
+#~ msgid "transExample"
+#~ msgstr "transExample"
+
+#: store/products/sagas.ts:11
+#: store/products/sagas.ts:11
 msgid "transSagaExample"
 msgstr "Translated test notification from saga after fetch"

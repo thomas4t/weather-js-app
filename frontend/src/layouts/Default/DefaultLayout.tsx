@@ -46,10 +46,10 @@ const DefaultLayout = ({ language, onChangeLanguage, children }: Props): JSX.Ele
             <Trans id="nav.home" message="Home" />
           </StyledNavLink>
           <StyledNavLink to={pages.Forecast.route.toUrl()} activeClassName="active">
-            <Trans id="nav.home" message="Forecast" />
+            <Trans id="nav.forecast" message="Forecast" />
           </StyledNavLink>
           <StyledNavLink to={pages.DatagridPage.route.toUrl()} activeClassName="active">
-            <Trans id="nav.home" message="About" />
+            <Trans id="nav.about" message="About" />
           </StyledNavLink>
         </Header>
         <Content>{children}</Content>

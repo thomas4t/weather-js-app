@@ -2,7 +2,7 @@ import { takeEvery, put } from 'redux-saga/effects'
 import { t } from '@lingui/macro'
 import { FetchAction } from '@inventi/keep'
 import { toProductRow } from '@typings/entities/ProductRow'
-import { isActionFetchRequestedFor, getFirstObjectProperty } from '../utils'
+import { isActionFetchRequestedFor, getFirstObjectProperty, weatherApiKey, weatherApiEndpoint } from '../utils'
 import fetch from '../fetch'
 
 function* fetchProducts(action: FetchAction): Generator {
@@ -16,7 +16,7 @@ function* fetchProductsOverridden(action: FetchAction): Generator {
   // Note here, how you can override action key or args
   // [method, url, payload]
   console.log('fetchProductsOverridden action', action)
-  const url = 'https://api.openweathermap.org/data/2.5/forecast?q=London,us&mode=json&appid=c10ab5db48ccf1a469e7c97fa0acd156'
+  const url = `${weatherApiEndpoint}/data/2.5/forecast?q=London,us&mode=json&appid=${weatherApiKey}`
   yield fetch(action, { args: ['GET', url] })
 }
 

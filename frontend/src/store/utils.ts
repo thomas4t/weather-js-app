@@ -19,8 +19,10 @@ export const isActionFetchFailedFor =
   (action: Action): boolean =>
     action.type === actionTypes.fetchError && get(action, 'args[0]') === key
 
-const weatherApiEndpoint =
+export const weatherApiEndpoint =
   typeof window !== 'undefined' ? getRuntimeConfig('FRONTEND__OPENWEATHERMAP_ENDPOINT_URL') : process.env.FRONTEND__OPENWEATHERMAP_ENDPOINT_URL
+
+export const weatherApiKey = typeof window !== 'undefined' ? getRuntimeConfig('FRONTEND__OPENWEATHERMAP_APIKEY') : process.env.FRONTEND__OPENWEATHERMAP_APIKEY
 
 // token not needed atm
 export const makeAxiosRequest = async (method: Method, url: string, variables?: { [key: string]: any }): Promise<any> => {
