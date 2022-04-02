@@ -13,22 +13,50 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: layouts/Default/DefaultLayout.tsx:52
+#: pages/Forecast/Forecast.tsx:29
+msgid "forecast.heading"
+msgstr "Vyhledávání podle města"
+
+#: pages/Forecast/Forecast.tsx:56
+msgid "forecast.search.clear"
+msgstr "Smazat"
+
+#: pages/Forecast/Forecast.tsx:46
+msgid "forecast.search.invalidSearch"
+msgstr "Zadejte alespoň 3 znaky"
+
+#: pages/Forecast/Forecast.tsx:60
+msgid "forecast.search.noResults"
+msgstr "Zdá se, že tu zatím nic není."
+
+#: pages/Forecast/Forecast.tsx:42
+msgid "forecast.search.submit"
+msgstr "Zkusit štěstí"
+
+#: pages/Forecast/Forecast.tsx:36
+msgid "forecast.searchInput.placeholder"
+msgstr "Zadejte výraz ..."
+
+#: layouts/Default/DefaultLayout.tsx:51
 msgid "nav.about"
 msgstr "O autorovi"
 
-#: layouts/Default/DefaultLayout.tsx:49
+#: layouts/Default/DefaultLayout.tsx:48
 msgid "nav.forecast"
 msgstr "Předpověd"
 
-#: layouts/Default/DefaultLayout.tsx:46
+#: layouts/Default/DefaultLayout.tsx:45
 msgid "nav.home"
 msgstr "Domů"
 
 #: store/user/sagas.ts:20
 #: store/user/sagas.ts:20
-msgid "notification.login.success"
-msgstr ""
+#~ msgid "notification.login.success"
+#~ msgstr ""
+
+#: pages/Homepage/Homepage.tsx:14
+msgid "page.homepage.title"
+msgstr "Vítejte!"
 
 #: pages/Homepage/Homepage.tsx:48
 #~ msgid "transExample"
@@ -36,5 +64,17 @@ msgstr ""
 
 #: store/products/sagas.ts:11
 #: store/products/sagas.ts:11
-msgid "transSagaExample"
-msgstr "Přeložená test notifikace ze ságy po fetchi"
+#~ msgid "transSagaExample"
+#~ msgstr "Přeložená test notifikace ze ságy po fetchi"
+
+#: pages/Forecast/components/WeatherCard.tsx:30
+msgid "weatherCard.dateFromTo"
+msgstr "Počasí od {from} do {to}."
+
+#: pages/Forecast/components/WeatherCard.tsx:53
+msgid "weatherCard.temp"
+msgstr "Teplota {temp} °C"
+
+#: pages/Forecast/components/WeatherCard.tsx:56
+msgid "weatherCard.tempFeelsLike"
+msgstr "Teplota pocitivě {temp} °C"

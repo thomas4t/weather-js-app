@@ -7,13 +7,13 @@ import Forecast from './Forecast'
 const reduxKey = 'weather#search'
 const sagaKey = 'weather:search'
 
-const productSelectors = createSelectors<CityWeather>(reduxKey)
+const searchSelectors = createSelectors<CityWeather>(reduxKey)
 
 const ForecastContainer = (): JSX.Element => {
   const dispatch = useDispatch()
   // TODO Move me to redux
   const [search, setSearch] = useState('')
-  const { data: searchResults, isLoading: isSearchLoading, error: searchError } = useSelector(productSelectors)
+  const { data: searchResults, isLoading: isSearchLoading, error: searchError } = useSelector(searchSelectors)
 
   const onSearch = useQueryFetch(reduxKey, sagaKey)
   const handleSearchSubmit = useCallback(() => onSearch({ query: search }), [onSearch, search])

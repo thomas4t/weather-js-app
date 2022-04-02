@@ -14,7 +14,7 @@ const Homepage = ({ isLoading, error }: Props): JSX.Element => (
       <Trans id="page.homepage.title" message="Homepage, welcome!" />
     </x.h2>
 
-    <Card mt="6">
+    <Card mt="6" display="flex" justifyContent="center">
       <img src="https://cataas.com/cat/says/Hello%20weather%20app!" alt="cat" />
     </Card>
   </Page>

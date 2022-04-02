@@ -1,5 +1,5 @@
-import DatagridPage from './About'
+import About from './About'
 
-const AboutContainer = (): JSX.Element => <DatagridPage />
+const AboutContainer = (): JSX.Element => <About />
 
 export default AboutContainer

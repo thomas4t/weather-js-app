@@ -1,4 +1,3 @@
-// Main
 export interface CityWeather {
   cod: string
   message: number

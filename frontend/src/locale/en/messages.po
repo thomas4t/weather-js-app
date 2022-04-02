@@ -13,22 +13,50 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: layouts/Default/DefaultLayout.tsx:52
+#: pages/Forecast/Forecast.tsx:29
+msgid "forecast.heading"
+msgstr "Lookup by city"
+
+#: pages/Forecast/Forecast.tsx:56
+msgid "forecast.search.clear"
+msgstr "Clear"
+
+#: pages/Forecast/Forecast.tsx:46
+msgid "forecast.search.invalidSearch"
+msgstr "Enter at least 3 characters"
+
+#: pages/Forecast/Forecast.tsx:60
+msgid "forecast.search.noResults"
+msgstr "Looks like we haven't found anything yet."
+
+#: pages/Forecast/Forecast.tsx:42
+msgid "forecast.search.submit"
+msgstr "Try your luck"
+
+#: pages/Forecast/Forecast.tsx:36
+msgid "forecast.searchInput.placeholder"
+msgstr "Type to search ..."
+
+#: layouts/Default/DefaultLayout.tsx:51
 msgid "nav.about"
 msgstr "About"
 
-#: layouts/Default/DefaultLayout.tsx:49
+#: layouts/Default/DefaultLayout.tsx:48
 msgid "nav.forecast"
 msgstr "Forecast"
 
-#: layouts/Default/DefaultLayout.tsx:46
+#: layouts/Default/DefaultLayout.tsx:45
 msgid "nav.home"
 msgstr "Home"
 
 #: store/user/sagas.ts:20
 #: store/user/sagas.ts:20
-msgid "notification.login.success"
-msgstr "You have been succesfully logged in."
+#~ msgid "notification.login.success"
+#~ msgstr "You have been succesfully logged in."
+
+#: pages/Homepage/Homepage.tsx:14
+msgid "page.homepage.title"
+msgstr "Homepage, welcome!"
 
 #: pages/Homepage/Homepage.tsx:48
 #~ msgid "transExample"
@@ -36,5 +64,17 @@ msgstr "You have been succesfully logged in."
 
 #: store/products/sagas.ts:11
 #: store/products/sagas.ts:11
-msgid "transSagaExample"
-msgstr "Translated test notification from saga after fetch"
+#~ msgid "transSagaExample"
+#~ msgstr "Translated test notification from saga after fetch"
+
+#: pages/Forecast/components/WeatherCard.tsx:30
+msgid "weatherCard.dateFromTo"
+msgstr "Weather from {from} to {to}."
+
+#: pages/Forecast/components/WeatherCard.tsx:53
+msgid "weatherCard.temp"
+msgstr "Temp {temp} °C"
+
+#: pages/Forecast/components/WeatherCard.tsx:56
+msgid "weatherCard.tempFeelsLike"
+msgstr "Temp feels like {temp} °C"

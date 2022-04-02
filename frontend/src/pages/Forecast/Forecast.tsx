@@ -48,7 +48,7 @@ const Forecast = ({ isLoading, error, search, searchResults, onSearchChange, onS
         )}
       </Button>
 
-      {error ? <Card mt="6">'error occured:(</Card> : null}
+      {error ? <Card mt="6">Error occured:(</Card> : null}
       {searchResults ? (
         <>
           <WeatherCard weather={searchResults} />
