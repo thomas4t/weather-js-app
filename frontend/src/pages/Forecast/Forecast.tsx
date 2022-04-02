@@ -1,41 +1,64 @@
 import { x } from '@xstyled/styled-components'
-import dayjs from 'dayjs'
+import { t } from '@lingui/macro'
+import { Trans } from '@lingui/react'
 import Page from '@components/blocks/Page'
-import { ProductRow } from '@typings/entities/ProductRow'
 import Card from '@components/elements/Card'
+import Input from '@components/elements/Input'
+import Icon from '@components/elements/Icon'
+import Button, { ButtonVariant } from '@components/elements/Button'
+import { CityWeather } from '@typings/entities/Weather'
+import WeatherCard from './components/WeatherCard'
 
 type Props = {
   isLoading?: boolean
-  products?: ProductRow[]
+  error?: string
+  search: string
+  searchResults?: CityWeather
+  onSearchChange: (value: string) => void
+  onSearchSubmit: () => void
+  onSearchClear: () => void
 }
 
-const Example = (props: Props): JSX.Element => (
-  <Page>
-    <x.h2 mb="2">Keep: a data fetching library</x.h2>
+const Forecast = ({ isLoading, error, search, searchResults, onSearchChange, onSearchSubmit, onSearchClear }: Props): JSX.Element => {
+  const searchValid = search?.length > 3
+  return (
+    <Page>
+      <x.h2 mb="2">
+        <Trans id="forecast.heading" message="Lookup by city" />
+      </x.h2>
 
-    <Card mt="6">
-      <x.h2 mb="2">Fetch data several ways (see ExampleContainer.tsx)</x.h2>
-      <x.h4>How much products do I have? {props.isLoading ? 'loading ...' : props.products?.length}</x.h4>
-    </Card>
+      <Input
+        value={search}
+        onChangeText={onSearchChange}
+        onEnter={onSearchSubmit}
+        placeholder={t({ id: 'forecast.searchInput.placeholder', message: 'Type to search ...' })}
+        icons={searchValid ? [<Icon key="checkTick" icon="checkTick" stroke="secondary4" strokeHovered="gray1" />] : undefined}
+      />
 
-    <x.h2 mt="12" mb="2">
-      An random image
-    </x.h2>
+      <Button type="button" onClick={onSearchSubmit} variant={searchValid ? ButtonVariant.primary : ButtonVariant.bare} disabled={!searchValid} my={4}>
+        {searchValid ? (
+          <Trans id="forecast.search.submit" message="Try your luck" />
+        ) : (
+          <>
+            <Icon icon="error" />
+            <Trans id="forecast.search.invalidSearch" message="Enter at least 3 characters" />
+          </>
+        )}
+      </Button>
 
-    <Card mt="6">
-      <img src="https://cataas.com/cat/says/hello%20world!" alt="cat" />
-    </Card>
+      {error ? <Card mt="6">'error occured:(</Card> : null}
+      {searchResults ? (
+        <>
+          <WeatherCard weather={searchResults} />
+          <Button type="button" onClick={onSearchClear} variant={ButtonVariant.secondary} mt={4}>
+            <Trans id="forecast.search.clear" message="Clear" />
+          </Button>
+        </>
+      ) : (
+        <Trans id="forecast.search.noResults" message="Looks like we haven't found anything yet." />
+      )}
+    </Page>
+  )
+}
 
-    <x.h2 mt="12" mb="2">
-      Example of date/time operations
-    </x.h2>
-
-    <Card mt="2">
-      <x.div>Date: {dayjs('2019-01-25').format('DD/MM/YYYY')}</x.div>
-      <x.div>Added 7 days {dayjs('2019-01-25').add(7, 'day').format('DD/MM/YYYY')}</x.div>
-      <x.div>Added 7 minutes {dayjs('2019-01-25').add(7, 'minute').format('DD/MM/YYYY HH:mm:ss')}</x.div>
-    </Card>
-  </Page>
-)
-
-export default Example
+export default Forecast

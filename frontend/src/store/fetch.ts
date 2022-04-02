@@ -26,20 +26,17 @@ const composableTransform = (transform: Transform | Transform[]) => (data: any) 
 function* restFetch(fetchAction: FetchAction, { transform, ...overriddenActionProps }: Options = {}): Generator {
   const promiseControl = fetchAction[promiseControlSymbol]
   const { key: keyFromAction, args: argsFromAction } = fetchAction
-  console.log('overriddenActionProps args: ', overriddenActionProps?.args)
   const key = overriddenActionProps?.key || keyFromAction
   const args = overriddenActionProps?.args ? mergeByRewriting(argsFromAction, overriddenActionProps?.args) : argsFromAction
 
-  //['products']
-  console.log('actual args: ', args)
+  console.log('restFetch args: ', args)
   const [method, url, payload] = args
   try {
     const responseData: any = yield call(() => makeAxiosRequest(method, url, payload))
     const data = transform ? composableTransform(transform)(responseData) : responseData
-    console.log('DATA', data)
     yield put(actions.fetchSuccess(key, args, data, promiseControl))
   } catch (e) {
-    //formatApiError(e)
+    // ... add formatApiError(e)
     yield put(actions.fetchError(key, args, String(e), promiseControl))
   }
 }

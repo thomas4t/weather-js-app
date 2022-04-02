@@ -26,13 +26,11 @@ export const weatherApiKey = typeof window !== 'undefined' ? getRuntimeConfig('F
 
 // token not needed atm
 export const makeAxiosRequest = async (method: Method, url: string, variables?: { [key: string]: any }): Promise<any> => {
-  console.log('Trying to make request server side', method)
   const { data } = await axios({
     method,
     url,
     data: variables,
   })
-  console.log('axios data', data)
   return data
 }
 

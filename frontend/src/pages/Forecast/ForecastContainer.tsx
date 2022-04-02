@@ -1,26 +1,34 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { createSelectors, useDispatchFetch, actions, useQueryFetch } from '@inventi/keep'
+import { createSelectors, actions, useQueryFetch } from '@inventi/keep'
 import Forecast from './Forecast'
+import { CityWeather } from '@typings/entities/Weather'
 
-const reduxKey = 'productsReduxKey'
-const sagaKey = 'productsOverridden'
+const reduxKey = 'weather#search'
+const sagaKey = 'weather:search'
 
-const productSelectors = createSelectors<Record<string, any>>(reduxKey)
+const productSelectors = createSelectors<CityWeather>(reduxKey)
 
 const ForecastContainer = (): JSX.Element => {
-  const loadProducts = useQueryFetch(reduxKey, sagaKey)
-  const { isLoading, data: products, error } = useSelector(productSelectors)
+  const dispatch = useDispatch()
+  // TODO Move me to redux
+  const [search, setSearch] = useState('')
+  const { data: searchResults, isLoading: searchLoading, error: searchError } = useSelector(productSelectors)
 
-  const queryFetchMemoized = useCallback(() => {
-    loadProducts({ moreParam: 1 })
-  }, [loadProducts])
+  const onSearch = useQueryFetch(reduxKey, sagaKey)
+  const handleSearchSubmit = useCallback(() => onSearch({ query: search }), [onSearch, search])
+  const handleClear = useCallback(() => dispatch(actions.fetchClear(reduxKey)), [useDispatch])
 
   return (
-    <>
-      <button onClick={queryFetchMemoized}>bloadProducts</button>Forecast
-      <Forecast isLoading={isLoading} />
-    </>
+    <Forecast
+      isLoading={searchLoading}
+      error={searchError}
+      search={search}
+      searchResults={searchResults}
+      onSearchChange={setSearch}
+      onSearchSubmit={handleSearchSubmit}
+      onSearchClear={handleClear}
+    />
   )
 }
 
