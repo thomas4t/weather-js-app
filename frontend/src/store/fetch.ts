@@ -1,8 +1,7 @@
 import flow from 'lodash/flow'
-import { put, call, select } from 'redux-saga/effects'
+import { put, call } from 'redux-saga/effects'
 import { actions, promiseControlSymbol, FetchAction } from '@inventi/keep'
-import getAuthorizationToken from '@store/user/getAuthorizationToken'
-import { getQuery, defaultTransform, makeRequest, formatApiError } from './utils'
+import { defaultTransform, makeAxiosRequest } from './utils'
 
 type Transform = (data: any) => any
 
@@ -24,20 +23,25 @@ const composableTransform = (transform: Transform | Transform[]) => (data: any) 
   return transform(data)
 }
 
-function* fetch(fetchAction: FetchAction, { transform, ...overriddenActionProps }: Options = {}): Generator {
-  const token = getAuthorizationToken(yield select())
+function* restFetch(fetchAction: FetchAction, { transform, ...overriddenActionProps }: Options = {}): Generator {
   const promiseControl = fetchAction[promiseControlSymbol]
   const { key: keyFromAction, args: argsFromAction } = fetchAction
+  console.log('overriddenActionProps args: ', overriddenActionProps?.args)
   const key = overriddenActionProps?.key || keyFromAction
   const args = overriddenActionProps?.args ? mergeByRewriting(argsFromAction, overriddenActionProps?.args) : argsFromAction
-  const [endpoint, variables, ...otherArgs] = args
+
+  //['products']
+  console.log('actual args: ', args)
+  const [method, url, payload] = args
   try {
-    const responseData: any = yield call(() => makeRequest(getQuery(endpoint, ...otherArgs), variables, token))
-    const data = transform ? composableTransform(transform)(responseData) : defaultTransform(responseData)
+    const responseData: any = yield call(() => makeAxiosRequest(method, url, payload))
+    const data = transform ? composableTransform(transform)(responseData) : responseData
+    console.log('DATA', data)
     yield put(actions.fetchSuccess(key, args, data, promiseControl))
   } catch (e) {
-    yield put(actions.fetchError(key, args, formatApiError(e), promiseControl))
+    //formatApiError(e)
+    yield put(actions.fetchError(key, args, String(e), promiseControl))
   }
 }
 
-export default fetch
+export default restFetch

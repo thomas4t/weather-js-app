@@ -1,10 +1,8 @@
 import get from 'lodash/get'
 import { Action } from 'redux'
 import { actionTypes } from '@inventi/keep'
-import { GraphQLClient, ClientError } from 'graphql-request'
-import { RequestDocument } from 'graphql-request/dist/types'
-import queries from '../queries'
 import getRuntimeConfig from '../utils/getRuntimeConfig'
+import axios, { Method } from 'axios'
 
 export const isActionFetchRequestedFor =
   (key: string) =>
@@ -16,42 +14,28 @@ export const isActionFetchSucceededFor =
   (action: Action): boolean =>
     action.type === actionTypes.fetchSuccess && get(action, 'args[0]') === key
 
-export const isActionMutationRequestedFor =
+export const isActionFetchFailedFor =
   (key: string) =>
   (action: Action): boolean =>
-    action.type === actionTypes.mutateStart && get(action, 'args[0]') === key
+    action.type === actionTypes.fetchError && get(action, 'args[0]') === key
 
-export const isActionMutationSucceededFor =
-  (key: string) =>
-  (action: Action): boolean =>
-    action.type === actionTypes.mutateSuccess && get(action, 'args[0]') === key
+const weatherApiEndpoint =
+  typeof window !== 'undefined' ? getRuntimeConfig('FRONTEND__OPENWEATHERMAP_ENDPOINT_URL') : process.env.FRONTEND__OPENWEATHERMAP_ENDPOINT_URL
 
-export const isActionMutationFailedFor =
-  (key: string) =>
-  (action: Action): boolean =>
-    action.type === actionTypes.mutateError && get(action, 'args[0]') === key
-
-const graphqlApiEndpoint =
-  typeof window !== 'undefined' ? getRuntimeConfig('FRONTEND__GRAPHQL_ENDPOINT_URL') : process.env.FRONTEND__GRAPHQL_ENDPOINT_URL_SERVER
-
-export const getQuery = (queryName: string, ...args: any[]): any => {
-  const query: (args: any[]) => string | undefined = queries[queryName]
-  if (!query) throw new Error(`Cannot found query ${queryName}.`)
-  return query(args)
-}
-
-export const makeRequest = async (document: RequestDocument, variables?: { [key: string]: any }, token?: string | null): Promise<any> => {
-  const shouldNotUseToken = typeof document === 'string' && document.includes('mutation login')
-  const client = new GraphQLClient(graphqlApiEndpoint) // TODO: memoize
-  if (token && !shouldNotUseToken) client.setHeader('Authorization', `Bearer ${token}`)
-  // @ts-ignore
-  const { data, extensions /* , errors, headers, status */ } = await client.rawRequest(document, variables)
-  Object.values(extensions?.warnings || []).map((warning: any) => console.warn(`makeRequest: ${warning?.message} -> (${JSON.stringify(warning?.path)})`))
+// token not needed atm
+export const makeAxiosRequest = async (method: Method, url: string, variables?: { [key: string]: any }): Promise<any> => {
+  console.log('Trying to make request server side', method)
+  const { data } = await axios({
+    method,
+    url,
+    data: variables,
+  })
+  console.log('axios data', data)
   return data
 }
 
-export const formatApiError = (e: ClientError | Error | any): string =>
-  e?.response?.errors ? JSON.parse(JSON.stringify(e?.response?.errors))[0]?.message : JSON.stringify(e?.message)
+// export const formatApiError = (e: ClientError | Error | any): string =>
+//   e?.response?.errors ? JSON.parse(JSON.stringify(e?.response?.errors))[0]?.message : JSON.stringify(e?.message)
 
 export const getFirstObjectProperty = (obj: Record<string, any> = {}): any => {
   const keys = Object.keys(obj)

@@ -1,5 +1,6 @@
 import Icon from '@components/elements/Icon'
 import styled, { x } from '@xstyled/styled-components'
+import LanguageSwitcher from '../LanguageSwitcher'
 
 const Wrap = styled.div`
   width: 100%;
@@ -26,24 +27,29 @@ const ChildrenWrap = styled.div`
     margin-right: 3;
   }
   & > *:first-child {
-    margin-left: 0;
+    margin-left: 5;
   }
 `
 
 export interface Props {
   title: string
   perex: string
+  language?: string
+  onChangeLanguage: (lang: string) => void
   children?: React.ReactNode
 }
 
-const Header = ({ title, perex, children }: Props): JSX.Element => (
+const Header = ({ title, perex, language, onChangeLanguage, children }: Props): JSX.Element => (
   <Wrap>
-    <x.div display="flex" justifyContent="center" alignItems="center" mb={3}>
-      <x.h1 display="none">{title}</x.h1>
-      <Icon icon="cloudyDay" width="4rem" height="4rem" />
-      <x.span fontSize="2rem" mt={2}>
-        {perex}
-      </x.span>
+    <x.div>
+      <LanguageSwitcher language={language} changeLanguage={onChangeLanguage} />
+      <x.div display="flex" justifyContent="center" alignItems="center" mb={3}>
+        <x.h1 display="none">{title}</x.h1>
+        <Icon icon="cloudyDay" width="4rem" height="4rem" />
+        <x.span fontSize="2rem" mt={2}>
+          {perex}
+        </x.span>
+      </x.div>
     </x.div>
 
     <BottomWrap>

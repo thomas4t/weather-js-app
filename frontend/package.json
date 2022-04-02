@@ -40,6 +40,7 @@
     "@sentry/node": "6.19.1",
     "@xstyled/styled-components": "3.5.1",
     "@xstyled/system": "3.5.1",
+    "axios": "^0.26.1",
     "connected-react-router": "6.9.2",
     "dayjs": "1.11.0",
     "debug": "4.3.4",

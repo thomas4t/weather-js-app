@@ -14,7 +14,10 @@ function* fetchProducts(action: FetchAction): Generator {
 
 function* fetchProductsOverridden(action: FetchAction): Generator {
   // Note here, how you can override action key or args
-  yield fetch(action, { args: ['products'], transform: [getFirstObjectProperty, toProductRow] })
+  // [method, url, payload]
+  console.log('fetchProductsOverridden action', action)
+  const url = 'https://api.openweathermap.org/data/2.5/forecast?q=London,us&mode=json&appid=c10ab5db48ccf1a469e7c97fa0acd156'
+  yield fetch(action, { args: ['GET', url] })
 }
 
 export default function* watch(): Generator {

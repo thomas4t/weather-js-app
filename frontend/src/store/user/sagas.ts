@@ -4,19 +4,14 @@ import debug from 'debug'
 import { t } from '@lingui/macro'
 import { FetchAction, actions as keepActions } from '@inventi/keep'
 import routes from '@pages/index'
-import { isActionFetchRequestedFor, isActionMutationRequestedFor, isActionMutationSucceededFor } from '../utils'
+import { isActionFetchRequestedFor } from '../utils'
 import fetch from '../fetch'
-import mutate from '../mutate'
 import { actionTypes, actions } from './index'
 
 const userDebug = debug('app:user')
 
 function* fetchMe(action: FetchAction): Generator {
   yield fetch(action)
-}
-
-function* mutateLogin(action: FetchAction): Generator {
-  yield mutate(action)
 }
 
 function* mutateLoginSuccess(action: FetchAction): Generator {
@@ -57,6 +52,6 @@ export default function* watch(): Generator {
   yield takeEvery(actionTypes.setLogin, onLoginSet)
   yield takeEvery(actionTypes.logout, onLogout)
   yield takeEvery(isActionFetchRequestedFor('me'), fetchMe)
-  yield takeEvery(isActionMutationRequestedFor('user:login'), mutateLogin)
-  yield takeEvery(isActionMutationSucceededFor('user:login'), mutateLoginSuccess)
+  // yield takeEvery(isActionMutationRequestedFor('user:login'), mutateLogin)
+  // yield takeEvery(isActionMutationSucceededFor('user:login'), mutateLoginSuccess)
 }

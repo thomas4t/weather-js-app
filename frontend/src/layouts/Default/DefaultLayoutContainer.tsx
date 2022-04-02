@@ -1,11 +1,18 @@
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { createSelectors as createKeepSelectors } from '@inventi/keep'
+import { useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { actions, selectors } from '@store/ui'
 import DefaultLayout from './DefaultLayout'
 
-export default connect(
-  (state) => ({
-    user: createKeepSelectors<IUser>('user')(state)?.data,
-  }),
-  (dispatch) => bindActionCreators({}, dispatch),
-)(DefaultLayout)
+export type Props = {
+  children: React.ReactNode
+}
+
+const DefaultLayoutContainer = ({ children }: Props): JSX.Element => {
+  const dispatch = useDispatch()
+  const changeLanguage = useCallback((lang: string) => dispatch(actions.setLanguage(lang)), [dispatch])
+  const language = useSelector(selectors.getLanguage)
+
+  return <DefaultLayout language={language} onChangeLanguage={changeLanguage} children={children} />
+}
+
+export default DefaultLayoutContainer
