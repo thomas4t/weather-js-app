@@ -11,7 +11,6 @@ const searchSelectors = createSelectors<CityWeather>(reduxKey)
 
 const ForecastContainer = (): JSX.Element => {
   const dispatch = useDispatch()
-  // TODO Move me to redux
   const [search, setSearch] = useState('')
   const { data: searchResults, isLoading: isSearchLoading, error: searchError } = useSelector(searchSelectors)
 

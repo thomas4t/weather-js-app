@@ -2406,10 +2406,10 @@
   resolved "https://registry.yarnpkg.com/@inventi/eslint-plugin-reinhard/-/eslint-plugin-reinhard-1.1.1.tgz#0ef30f64315231b75309c07a76d029703902e093"
   integrity sha512-OjMI3iaxoKx56hLxK9jrvu7KQpFpkt6KcRKZ8F9nCo7IBYpvYLqH5Yu3i8gfKLOf7eMmVhRDXE0QhadlJsdPgA==
 
-"@inventi/keep@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@inventi/keep/-/keep-1.8.0.tgz#ab0a756fce2fe2982692dd41dcb2c76145bd0390"
-  integrity sha512-T+3IgQ79fr6cK4vtLQCvZzbcR8JP1SbdxKI/SJjPn0P1lZZMuGJ3q0uZbzAWlLcedQ4b0bHpagkKwecnw8RBWw==
+"@inventi/keep@^1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@inventi/keep/-/keep-1.9.0.tgz#736725ad49c35aaee43fb18e06434dac014d8184"
+  integrity sha512-j1hJmIfw8oHGfx1P//O5X10K36MNDqdGBU32uGYn/1QiUsCHIGUVCfTQKQjdJgpNFzy1CCzP3dY+pskacJzTGw==
 
 "@inventi/theme@^1.1.0":
   version "1.1.0"

@@ -4,7 +4,7 @@ import { selectors } from '@store/ui'
 import { isActionFetchRequestedFor, weatherApiKey, weatherApiEndpoint } from '../utils'
 import fetch from '../fetch'
 
-function* fetchWeaterSearch(action: FetchAction): Generator {
+function* fetchWeatherSearch(action: FetchAction): Generator {
   const appLang = (yield select(selectors.getLanguage)) as string
   const payload = action.args.at(-1)?.query
   const payloadLang =
@@ -17,5 +17,5 @@ function* fetchWeaterSearch(action: FetchAction): Generator {
 }
 
 export default function* watch(): Generator {
-  yield takeEvery(isActionFetchRequestedFor('weather:search'), fetchWeaterSearch)
+  yield takeEvery(isActionFetchRequestedFor('weather:search'), fetchWeatherSearch)
 }

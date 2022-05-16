@@ -26,7 +26,7 @@
   "dependencies": {
     "@hookydev/babel-plugin-styled-components": "1.10.7-1",
     "@inventi/create-route": "^1.0.6",
-    "@inventi/keep": "^1.8.0",
+    "@inventi/keep": "^1.9.0",
     "@inventi/theme": "^1.1.0",
     "@lingui/core": "3.13.2",
     "@lingui/macro": "3.13.2",

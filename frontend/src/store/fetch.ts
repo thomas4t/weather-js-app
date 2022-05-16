@@ -1,6 +1,6 @@
 import flow from 'lodash/flow'
 import { put, call } from 'redux-saga/effects'
-import { actions, promiseControlSymbol, FetchAction } from '@inventi/keep'
+import { actions, FetchAction } from '@inventi/keep'
 import { makeAxiosRequest } from './utils'
 
 type Transform = (data: any) => any
@@ -24,7 +24,6 @@ const composableTransform = (transform: Transform | Transform[]) => (data: any) 
 }
 
 function* restFetch(fetchAction: FetchAction, { transform, ...overriddenActionProps }: Options = {}): Generator {
-  const promiseControl = fetchAction[promiseControlSymbol]
   const { key: keyFromAction, args: argsFromAction } = fetchAction
   const key = overriddenActionProps?.key || keyFromAction
   const args = overriddenActionProps?.args ? mergeByRewriting(argsFromAction, overriddenActionProps?.args) : argsFromAction
@@ -34,10 +33,10 @@ function* restFetch(fetchAction: FetchAction, { transform, ...overriddenActionPr
   try {
     const responseData: any = yield call(() => makeAxiosRequest(method, url, payload))
     const data = transform ? composableTransform(transform)(responseData) : responseData
-    yield put(actions.fetchSuccess(key, args, data, promiseControl))
+    yield put(actions.fetchSuccess(key, args, data, fetchAction.promise))
   } catch (e) {
     // ... add formatApiError(e)
-    yield put(actions.fetchError(key, args, String(e), promiseControl))
+    yield put(actions.fetchError(key, args, String(e), fetchAction.promise))
   }
 }
 
